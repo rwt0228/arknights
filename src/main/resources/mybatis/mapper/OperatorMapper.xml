@@ -5,10 +5,22 @@
     <sql id="Base_Column_List" >
        id,name,star,type,avatar
     </sql>
+    <sql id="Nonid_Column_List" >
+        name,star,type,avatar
+    </sql>
 
     <select id="selectAll" resultType="com.rwt.arknights.videos.bean.Operator">
         select <include refid="Base_Column_List"/>
         from operator
         order by id
     </select>
+
+    <insert id="save" parameterType="com.rwt.arknights.videos.bean.Operator">
+        <selectKey keyProperty="id" order="AFTER" resultType="Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+
+        insert into operator(<include refid="Nonid_Column_List" />)
+        values(#{name},#{star},#{type},#{avatar})
+    </insert>
 </mapper>

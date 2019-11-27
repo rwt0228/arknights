@@ -18,4 +18,8 @@ public class OperatorService {
     public List<Operator> selectAll() {
         return operatorMapper.selectAll();
     }
+
+    public int save(Operator operator) {
+        return operatorMapper.save(operator);
+    }
 }

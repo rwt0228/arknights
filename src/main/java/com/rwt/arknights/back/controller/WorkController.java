@@ -1,6 +1,8 @@
 package com.rwt.arknights.back.controller;
 
+import com.rwt.arknights.videos.bean.Operator;
 import com.rwt.arknights.videos.service.OperatorService;
+import com.rwt.arknights.web.bean.JsonResult;
 import com.rwt.arknights.web.bean.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,5 +20,12 @@ public class WorkController {
     @ResponseBody
     public PageBean operatorList() {
         return new PageBean(operatorService.selectAll());
+    }
+
+    @RequestMapping("/operator/save")
+    @ResponseBody
+    public JsonResult operatorSave(Operator operator) {
+        operatorService.save(operator);
+        return JsonResult.OK();
     }
 }

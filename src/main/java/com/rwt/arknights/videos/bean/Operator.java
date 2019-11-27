@@ -8,4 +8,5 @@ public class Operator {
     private String name;
     private Integer star;
     private String type;
+    private String avatar;
 }

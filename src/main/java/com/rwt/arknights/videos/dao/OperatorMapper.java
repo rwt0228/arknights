@@ -8,4 +8,6 @@ import java.util.List;
 @Mapper
 public interface OperatorMapper {
     List<Operator> selectAll();
+
+    int save(Operator operator);
 }

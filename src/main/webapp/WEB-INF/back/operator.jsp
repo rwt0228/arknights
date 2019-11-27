@@ -7,6 +7,15 @@
     <%@include file="../common/head.jsp"%>
 </head>
 <body>
+<style>
+    .modal-body table {
+        width: 100%;
+    }
+    .modal-body input {
+        width: 100%;
+    }
+</style>
+
 <div class="container">
     <div id="toolbar" class="btn-group">
         <button id="btn_add" type="button" class="btn  btn-default"  onclick="oper('add')">
@@ -15,6 +24,67 @@
     </div>
     <table id="table"></table>
 </div>
+
+<!-- 模态框 -->
+<div class="modal fade" id="operatorModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title"><span id="operateInfo"></span>干员</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <table>
+
+                    <tr>
+                        <td>姓名：</td>
+                        <td><input id="name" /></td>
+                    </tr>
+                    <tr>
+                        <td>星级：</td>
+                        <td><select id="star" style="width: 100%">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select></td>
+                    </tr>
+                    <tr>
+                        <td>类型：</td>
+                        <td><select id="type" style="width: 100%">
+                            <option value="狙击">狙击</option>
+                            <option value="术师">术师</option>
+                            <option value="先锋">先锋</option>
+                            <option value="近卫">近卫</option>
+                            <option value="重装">重装</option>
+                            <option value="医疗">医疗</option>
+                            <option value="辅助">辅助</option>
+                            <option value="特种">特种</option>
+                        </select></td>
+                    </tr>
+                    <tr>
+                        <td>头像：</td>
+                        <td><input id="avatar" style="width: 100px" onkeypress="myKeyPress(event.keyCode||event.which)" onchange="changeAvatar()"/><img id="img-avatar" style="height:50px;width: auto;" src="" id="face"/></td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="saveBtn" onclick="save()">保存</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 <script>
     $(function () {
@@ -28,7 +98,7 @@
             method: 'get',     //请求方式
             cache: false,      //是否使用缓存
 //            toolbar:'#toolbar',//工具按钮用哪个容器
-            height: 600,     //设置行高,没有设置的话,就默认取pageSize条数自适应
+            height: 850,     //设置行高,没有设置的话,就默认取pageSize条数自适应
             striped: true,     //是否显示行间隔色
             strickSearch: true,
             sortOrder: "asc",   //排序方式
@@ -77,6 +147,13 @@
                     sortable:"true"
                 },
                 {
+                    field:"type",
+                    title:"类型",
+                    align:"center",
+                    valign:"middle",
+                    sortable:"true"
+                },
+                {
                     field:"avatar",
                     title:"头像",
                     align:"center",
@@ -115,6 +192,69 @@
                 '<a class="remove" href="javascript:void(0)" onclick="del('+value+')" title="删除">' + '<i class="glyphicon glyphicon-remove-circle">' + '</i>' + '</a>'
                 ;
         };
+    }
+
+    function oper(oper, id) {
+        $("#operatorModal").modal("show");
+        if(oper == "add") {
+            $("#operateInfo").html("添加");
+        } else if(oper == "edit") {
+            $("#operateInfo").html("修改");
+        } else {
+            $("#operateInfo").html("查看");
+            $("#saveBtn").hide();
+        }
+    }
+
+    function save() {
+        $.ajax({
+            url: "/work/operator/save",
+            data: getOperator(),
+            type: 'post',
+            success: function (data) {
+                if(!data.status) {
+                    runNotify({
+                        type: 'notify',
+                        message: data.message,
+                        levelMessage: 'error'
+                    });
+                    return;
+                }
+                runNotify({
+                    type: 'notify',
+                    message: data.message,
+                    levelMessage: 'success'
+                });
+            },
+            error: function(data){
+                runNotify({
+                    type: 'notify',
+                    message: '网络异常，请刷新重试',
+                    levelMessage: 'error',
+                });
+            }
+        });
+    }
+
+    function getOperator() {
+        var obj = {};
+        obj.name = $("#name").val();
+        obj.star = $("#star").val();
+        obj.type = $("#type").val();
+        obj.avatar = getAvatarUrl($("#avatar").val());
+        return obj;
+    }
+
+    function getAvatarUrl(str) {
+        return "/images/avatar/" + str + ".png";
+    }
+    function changeAvatar() {
+        $("#img-avatar").attr("src", getAvatarUrl($("#avatar").val()));
+    }
+    function myKeyPress(c) {
+        if(c == 96) {
+            $("#name").focus();
+        }
     }
 </script>
 
