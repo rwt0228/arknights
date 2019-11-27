@@ -24,7 +24,7 @@
 
     function initTable() {
         $('#table').bootstrapTable({
-            url:'/uploader/pagelist', //接口地址,注意:数据放在rows字段
+            url:'/work/operator/list', //接口地址,注意:数据放在rows字段
             method: 'get',     //请求方式
             cache: false,      //是否使用缓存
 //            toolbar:'#toolbar',//工具按钮用哪个容器

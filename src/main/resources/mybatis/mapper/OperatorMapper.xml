@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rwt.arknights.videos.dao.OperatorMapper" >
+
+    <sql id="Base_Column_List" >
+       id,name,star,type,avatar
+    </sql>
+
+    <select id="selectAll" resultType="com.rwt.arknights.videos.bean.Operator">
+        select <include refid="Base_Column_List"/>
+        from operator
+        order by id
+    </select>
+</mapper>

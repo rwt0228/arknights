@@ -8,7 +8,7 @@
 <link href="/css/bootstrap.min.css" type="text/css" rel="stylesheet"/>
 <link href="/css/bootstrap-table.min.css" type="text/css" rel="stylesheet"/>
 <link href="/css/bootstrapValidator.min.css" type="text/css" rel="stylesheet"/>
-<link href="/css/fontawesome.min.css" type="text/css" rel="stylesheet"/>
+<link href="/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
 <link href="/css/notifyMessage.css" type="text/css" rel="stylesheet"/>
 <!-- Favicon -->
 <!-- Favicon and Touch Icons -->
