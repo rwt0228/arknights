@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rwt.arknights.videos.dao.StageMapper" >
+
+     <select id="selectAllType" resultType="com.rwt.arknights.videos.bean.StageType">
+        select type_id, description
+        from stage_type
+        order by type_id
+     </select>
+
+    <select id="selectAllStageByType" resultType="com.rwt.arknights.videos.bean.Stage">
+        select id, type, code, is_tag
+        from stage
+        where type = #{typeId}
+        order by id
+    </select>
+</mapper>

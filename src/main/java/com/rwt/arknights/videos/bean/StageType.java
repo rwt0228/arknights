@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class StageType {
-    private Integer stageId;
+    private Integer typeId;
     private String description;
 }
