@@ -3,13 +3,13 @@
 <mapper namespace="com.rwt.arknights.videos.dao.StageMapper" >
 
      <select id="selectAllType" resultType="com.rwt.arknights.videos.bean.StageType">
-        select type_id, description
+        select type_id, description, is_tag
         from stage_type
         order by type_id
      </select>
 
     <select id="selectAllStageByType" resultType="com.rwt.arknights.videos.bean.Stage">
-        select id, type, code, is_tag
+        select id, type, code
         from stage
         where type = #{typeId}
         order by id

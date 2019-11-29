@@ -6,4 +6,6 @@ import lombok.Data;
 public class StageType {
     private Integer typeId;
     private String description;
+    private Boolean isTag;
+
 }
