@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    a {
+        text-decoration: none;
+    }
+    .my-title {
+        float: left;
+        line-height: 61px;
+        font-size: 30px;
+        font-weight: 700;
+        color: wheat;
+        margin: 0 30px;
+    }
+    .el-menu-item a{
+        line-height: 61px;
+        display: inline-block;
+    }
+</style>
+<body>
+<div id="app" >
+    <mmenu></mmenu>
+</div>
+<template id="my-menu">
+    <div>
+        <el-menu
+                :default-active="activeIndex"
+                class="el-menu-demo"
+                mode="horizontal"
+                background-color="#545c64"
+                text-color="#fff"
+                active-text-color="#ffd04b">
+            <span class="my-title">明日方舟作战记录馆</span>
+            <el-menu-item index="1"><router-link to="/抄作业">我要抄作业</router-link></el-menu-item>
+            <el-menu-item index="2"><router-link to="/写作业">我要写作业</router-link></el-menu-item>
+        </el-menu>
+        <router-view></router-view>
+    </div>
+</template>
+<template id="copy">
+    <div>
+        我要抄作业的template
+    </div>
+</template>
+
+</body>
+<!-- import Vue before Element -->
+<script src="/js/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!--<script src="/js/vue.min.js"></script>-->
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<script>
+
+
+    const Share = { template: '<div>我要写作业</div>' };
+    const Copy = { template: '#copy' };
+    const Menu = {
+        data() {
+            return {
+                activeIndex: '1',
+            };
+        },
+        template: '#my-menu',
+
+    };
+    const routes = [
+        { path: '/抄作业', component: Copy },
+        { path: '/写作业', component: Share },
+        { path: '/', component: Copy }
+    ];
+    const router = new VueRouter({routes});
+    new Vue({
+        el: '#app',
+        router,
+        components : {
+            mmenu: Menu, // 注册组件
+        }
+    })
+
+
+</script>
+</html>

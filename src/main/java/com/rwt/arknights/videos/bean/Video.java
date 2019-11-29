@@ -9,5 +9,6 @@ public class Video {
     private Integer stageId;
     private String note;    //上传备注
     private String imgUrl;
+    private String type;    //1作业2论文3迫害4其他类型
 
 }
