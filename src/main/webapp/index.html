@@ -76,7 +76,7 @@
                 </el-col>
                 <el-col :span="8">
                     <el-form-item label="关卡选择">
-                        <el-input v-model="form.name" readonly @click.native="clickStage"></el-input>
+                        <el-input v-model="form.name" readonly></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -91,17 +91,22 @@
                 </el-col>
             </el-row>
             <el-form-item label="选择干员">
-                <el-input v-model="form.name"></el-input>
+                <el-input v-model="form.name" readonly @click.native="clickOperator"></el-input>
             </el-form-item>
         </el-form>
         <!--选择关卡-->
-        <selectstage ref="select_stage"></selectstage>
+        <select-operator ref="select_operator"></select-operator>
     </div>
 </template>
-<template id="selectStage">
+<template id="selectOperator">
     <div>
-        <el-dialog title="提示"  :visible.sync="visible"  width="30%">
-            <span>这是一段信息</span>
+        <el-dialog title="请选择干员"  :visible.sync="visible"  width="30%">
+            <el-tree :data="data" accordion show-checkbox node-key="id" ref="tree" highlight-current :props="defaultProps">
+              <span class="custom-tree-node" slot-scope="{ node, data }">
+                <span><img style="height: 19.2px; vertical-align: top;" :src="data.avatar"/></span>
+                <span>{{ node.label }}</span>
+              </span>
+            </el-tree>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="visible = false">取 消</el-button>
                 <el-button type="primary" @click="visible = false">确 定</el-button>
@@ -111,18 +116,24 @@
 </template>
 
 </body>
-<script src="/js/vue.min.js"></script>
+<!--<script src="/js/vue.min.js"></script>-->
+<script src="/operators.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 
-    const SelectStage = {
-        template: '#selectStage',
+    const SelectOperator = {
+        template: '#selectOperator',
         data() {
             return {
-                visible: false
+                visible: false,
+                data: operators,
+                defaultProps: {
+                    children: 'children',
+                    label: 'name',
+                }
             }
         },
         methods: {
@@ -152,13 +163,13 @@
             onSubmit() {
                 console.log('submit!');
             },
-            clickStage() {
-                this.$refs.select_stage.show();
+            clickOperator() {
+                this.$refs.select_operator.show();
             }
         },
         template: '#share',
         components: {
-            'selectstage': SelectStage,
+            'select-operator': SelectOperator,
         }
     };
 
@@ -183,6 +194,16 @@
         router,
         components : {
             mmenu: Menu, // 注册组件
+        },
+        created(){
+//            axios.get('/work/operator/list',{       // 还可以直接把参数拼接在url后边
+//                params:{
+//                }
+//            }).then(function(res){
+//                console.info(res)
+//            }).catch(function (error) {
+//                console.log(error);
+//            });
         }
     })
 
