@@ -47,23 +47,121 @@
     </div>
 </template>
 <template id="copy">
+    <div  style="padding: 30px">
+        <div>
+            <el-button type="warning">排除干员列表</el-button>
+            <div style="height: 20px;"></div>
+            <el-table  border style="width: 100%">
+                <el-table-column prop="av" label="av号" ></el-table-column>
+                <el-table-column prop="title" label="标题" > </el-table-column>
+                <el-table-column prop="img" label="封面" > </el-table-column>
+                <el-table-column prop="stage" label="关卡" > </el-table-column>
+                <el-table-column prop="operator" label="干员列表" > </el-table-column>
+                <el-table-column prop="level" label="平均等级" sortable> </el-table-column>
+                <el-table-column prop="level" label="操作" > </el-table-column>
+            </el-table>
+        </div>
+    </div>
+</template>
+<!--我要写作业的视图-->
+<template id="share">
+    <div  style="padding: 30px; width: 80%; margin: 0 auto">
+        <!--表单-->
+        <el-form ref="form"  :model="form" label-width="90px">
+            <el-row>
+                <el-col :span="8">
+                    <el-form-item label="视频av号">
+                        <el-input v-model="form.name"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="关卡选择">
+                        <el-input v-model="form.name" readonly @click.native="clickStage"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="视频类型">
+                        <el-select style="width: 100%;" v-model="form.region" placeholder="请选择视频类型">
+                            <el-option label="作业向" value="1"></el-option>
+                            <el-option label="论文向" value="2"></el-option>
+                            <el-option label="迫害向" value="3"></el-option>
+                            <el-option label="其他" value="4"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-form-item label="选择干员">
+                <el-input v-model="form.name"></el-input>
+            </el-form-item>
+        </el-form>
+        <!--选择关卡-->
+        <selectstage ref="select_stage"></selectstage>
+    </div>
+</template>
+<template id="selectStage">
     <div>
-        我要抄作业的template
+        <el-dialog title="提示"  :visible.sync="visible"  width="30%">
+            <span>这是一段信息</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="visible = false">取 消</el-button>
+                <el-button type="primary" @click="visible = false">确 定</el-button>
+             </span>
+        </el-dialog>
     </div>
 </template>
 
 </body>
-<!-- import Vue before Element -->
 <script src="/js/vue.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<!--<script src="/js/vue.min.js"></script>-->
-<!-- import JavaScript -->
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 
+    const SelectStage = {
+        template: '#selectStage',
+        data() {
+            return {
+                visible: false
+            }
+        },
+        methods: {
+            show(){
+                this.visible = true;
+            }
+        }
+    };
 
-    const Share = { template: '<div>我要写作业</div>' };
+    const Share = {
+        data() {
+            return {
+                form: {
+                    name: '',
+                    region: '',
+                    date1: '',
+                    date2: '',
+                    delivery: false,
+                    type: [],
+                    resource: '',
+                    desc: ''
+                },
+                stage_visible: false
+            }
+        },
+        methods: {
+            onSubmit() {
+                console.log('submit!');
+            },
+            clickStage() {
+                this.$refs.select_stage.show();
+            }
+        },
+        template: '#share',
+        components: {
+            'selectstage': SelectStage,
+        }
+    };
+
     const Copy = { template: '#copy' };
     const Menu = {
         data() {
