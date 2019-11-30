@@ -67,7 +67,7 @@ public class BiliClient {
         Map map = (Map<String, Object>) JSONUtils.parse(json);
         Map data = (Map<String, Object>) map.get("data");
         VideoInfoDTO dto = new VideoInfoDTO();
-        dto.setAvId(av);
+        dto.setAid(av);
         dto.setTitle((String) data.get("title"));
         dto.setPic((String) data.get("pic"));
         dto.setDesc((String) data.get("desc"));
@@ -76,8 +76,4 @@ public class BiliClient {
         return dto;
     }
 
-    public static void main(String[] args) {
-        VideoInfoDTO videoInfoDTO = getVideoInfoDTO(77229177);
-        int cc = 1;
-    }
 }

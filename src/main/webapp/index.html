@@ -2,6 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="never">
+
     <!-- import CSS -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 </head>
@@ -10,9 +12,11 @@
         margin: 0;
         padding: 0;
     }
+
     a {
         text-decoration: none;
     }
+
     .my-title {
         float: left;
         line-height: 61px;
@@ -21,13 +25,14 @@
         color: wheat;
         margin: 0 30px;
     }
-    .el-menu-item a{
+
+    .el-menu-item a {
         line-height: 61px;
         display: inline-block;
     }
 </style>
 <body>
-<div id="app" >
+<div id="app">
     <mmenu></mmenu>
 </div>
 <template id="my-menu">
@@ -40,38 +45,42 @@
                 text-color="#fff"
                 active-text-color="#ffd04b">
             <span class="my-title">明日方舟作战记录馆</span>
-            <el-menu-item index="1"><router-link to="/抄作业">我要抄作业</router-link></el-menu-item>
-            <el-menu-item index="2"><router-link to="/写作业">我要写作业</router-link></el-menu-item>
+            <el-menu-item index="1">
+                <router-link to="/抄作业">我要抄作业</router-link>
+            </el-menu-item>
+            <el-menu-item index="2">
+                <router-link to="/写作业">我要写作业</router-link>
+            </el-menu-item>
         </el-menu>
         <router-view></router-view>
     </div>
 </template>
 <template id="copy">
-    <div  style="padding: 30px">
+    <div style="padding: 30px">
         <div>
             <el-button type="warning">排除干员列表</el-button>
             <div style="height: 20px;"></div>
-            <el-table  border style="width: 100%">
-                <el-table-column prop="av" label="av号" ></el-table-column>
-                <el-table-column prop="title" label="标题" > </el-table-column>
-                <el-table-column prop="img" label="封面" > </el-table-column>
-                <el-table-column prop="stage" label="关卡" > </el-table-column>
-                <el-table-column prop="operator" label="干员列表" > </el-table-column>
-                <el-table-column prop="level" label="平均等级" sortable> </el-table-column>
-                <el-table-column prop="level" label="操作" > </el-table-column>
+            <el-table border style="width: 100%">
+                <el-table-column prop="av" label="av号"></el-table-column>
+                <el-table-column prop="title" label="标题"></el-table-column>
+                <el-table-column prop="img" label="封面"></el-table-column>
+                <el-table-column prop="stage" label="关卡"></el-table-column>
+                <el-table-column prop="operator" label="干员列表"></el-table-column>
+                <el-table-column prop="level" label="平均等级" sortable></el-table-column>
+                <el-table-column prop="level" label="操作"></el-table-column>
             </el-table>
         </div>
     </div>
 </template>
 <!--我要写作业的视图-->
 <template id="share">
-    <div  style="padding: 30px; width: 80%; margin: 0 auto">
+    <div style="padding: 30px; width: 80%; margin: 0 auto">
         <!--表单-->
-        <el-form ref="form"  :model="form" label-width="90px">
+        <el-form ref="form" :model="form" label-width="90px">
             <el-row>
                 <el-col :span="8">
                     <el-form-item label="视频av号">
-                        <el-input v-model="form.av_id"></el-input>
+                        <el-input v-model="form.av_id" ></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -84,42 +93,50 @@
                         </el-select>
                     </el-form-item>
                 </el-col>
+                <el-col :span="8">
+                    <el-button type="success" plain @click="clickVideoInfo">预览视频信息</el-button>
+                </el-col>
             </el-row>
             <el-row>
                 <el-col :span="8">
                     <el-form-item label="关卡类型">
-                        <el-select style="width: 100%;" v-model="stage_type" @change="change_type()" placeholder="请选择关卡类型">
-                            <el-option v-for="type in stage_type_list" :label="type.description" :value="type.description" v-bind:key="type.id"></el-option>
+                        <el-select style="width: 100%;" v-model="stage_type" @change="changeType()"
+                                   placeholder="请选择关卡类型">
+                            <el-option v-for="type in stage_type_list" :label="type.description"
+                                       :value="type.description" v-bind:key="type.id"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
                     <el-form-item label="关卡代号">
                         <el-select style="width: 100%;" v-model="form.stage_id" placeholder="请先选择关卡代号">
-                            <el-option  v-for="s in stages" :label="s.code" :value="s.id" v-bind:key="s.id"></el-option>
+                            <el-option v-for="s in stages" :label="s.code" :value="s.id" v-bind:key="s.id"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
                 <el-col :span="8" v-show="form.is_tag">
                     <el-form-item label="合约等级">
                         <el-select style="width: 100%;" v-model="form.total_tag" placeholder="请先选择合约等级">
-                            <el-option  v-for="i in 35" :label="i" :value="i" v-bind:key="i"></el-option>
+                            <el-option v-for="i in 35" :label="i" :value="i" v-bind:key="i"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-form-item label="选择干员">
-                <el-input  readonly @click.native="clickOperator"></el-input>
+                <el-input readonly @click.native="clickOperator"></el-input>
             </el-form-item>
         </el-form>
         <!--选择关卡-->
         <select-operator ref="select_operator"></select-operator>
+
+        <video_info ref="video_info"></video_info>
     </div>
 </template>
 <template id="selectOperator">
     <div>
-        <el-dialog title="请选择干员"  :visible.sync="visible"  width="30%">
-            <el-tree :data="data" accordion show-checkbox node-key="id" ref="tree" highlight-current :props="defaultProps">
+        <el-dialog title="请选择干员" :visible.sync="visible" width="30%">
+            <el-tree :data="data" accordion show-checkbox node-key="id" ref="tree" highlight-current
+                     :props="defaultProps">
               <span class="custom-tree-node" slot-scope="{ node, data }">
                 <span><img style="height: 19.2px; vertical-align: top;" :src="data.avatar"/></span>
                 <span>{{ node.label }}</span>
@@ -132,6 +149,34 @@
         </el-dialog>
     </div>
 </template>
+<template id="videoInfo">
+    <div>
+        <el-dialog title="视频信息" :visible.sync="visible" width="30%">
+            <el-form label-width="50px">
+                <el-form-item label="av号">
+                    <el-input v-model="info.aid" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="Up主">
+                    <el-input v-model="info.upName" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="标题">
+                    <el-input v-model="info.title" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="封面">
+                    <img :src="info.pic" style="height: 150px;"/>
+                </el-form-item>
+                <el-form-item label="简介">
+                    <el-input type="textarea" v-model="info.desc" disabled></el-input>
+                </el-form-item>
+
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="visible = false">关闭</el-button>
+             </span>
+        </el-dialog>
+    </div>
+</template>
+
 
 </body>
 <!--<script src="/js/vue.min.js"></script>-->
@@ -142,7 +187,32 @@
 <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-
+    const VideoInfo = {
+        template: '#videoInfo',
+        data() {
+            return {
+                visible: false,
+                info: {
+                    aid: 1,
+                    upName: '',
+                    title: '',
+                    desc: '',
+                    pic: '',
+                }
+            }
+        },
+        methods: {
+            async show(aid) {
+                var res = await axios.post('/video/getInfo?aid=' + aid);
+                if(!res.data.status) {
+                    this.$message.error('查询b站视频信息错误，请确认AV号正确');
+                    return;
+                }
+                this.info = res.data.data;
+                this.visible = true;
+            }
+        }
+    };
     const SelectOperator = {
         template: '#selectOperator',
         data() {
@@ -156,7 +226,7 @@
             }
         },
         methods: {
-            show(){
+            show() {
                 this.visible = true;
             }
         }
@@ -185,31 +255,47 @@
             clickOperator() {
                 this.$refs.select_operator.show();
             },
-            change_type() {
+            clickVideoInfo() {
+                if (!this.form.av_id) {
+                    this.$message({
+                        message: '请先输入AV号',
+                        type: 'warning'
+                    });
+                    return;
+                }
+                this.$refs.video_info.show(this.form.av_id);
+            },
+            changeType() {
                 this.form.stage_id = this.stage_map[this.stage_type][0].id;
-                var list =this.stage_type_list;
+                var list = this.stage_type_list;
                 var type = this.stage_type;
-                for(var i = 0; i < list.length; i++) {
-                    if(list[i].description == type) {
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i].description == type) {
                         this.form.is_tag = list[i].isTag;
                         break;
                     }
                 }
-
+            },
+            digitOnly(e) {
+                let a = e.key.replace(/[^\d]/g, "");
+                if (!a) {
+                    e.preventDefault();
+                }
             }
         },
         computed: {
-            stages: function() {
+            stages: function () {
                 return stageMap[this.stage_type];
             }
         },
         template: '#share',
         components: {
             'select-operator': SelectOperator,
+            'video_info': VideoInfo,
         }
     };
 
-    const Copy = { template: '#copy' };
+    const Copy = {template: '#copy'};
     const Menu = {
         data() {
             return {
@@ -220,18 +306,18 @@
 
     };
     const routes = [
-        { path: '/抄作业', component: Copy },
-        { path: '/写作业', component: Share },
-        { path: '/', component: Copy }
+        {path: '/抄作业', component: Copy},
+        {path: '/写作业', component: Share},
+        {path: '/', component: Copy}
     ];
     const router = new VueRouter({routes});
     new Vue({
         el: '#app',
         router,
-        components : {
+        components: {
             mmenu: Menu, // 注册组件
         },
-        created(){
+        created() {
 //            axios.get('/work/operator/list',{       // 还可以直接把参数拼接在url后边
 //                params:{
 //                }
