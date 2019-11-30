@@ -111,9 +111,9 @@
                     <td class="name-label">{{o.name}}</td>
                     <td>
                         <el-select style="width: 100%;" v-model="o.jingying" placeholder="精英化(必填)">
-                            <el-option label="精零" value="1"></el-option>
-                            <el-option label="精一" value="2"></el-option>
-                            <el-option label="精二" value="3"></el-option>
+                            <el-option label="精零" value="0"></el-option>
+                            <el-option label="精一" value="1"></el-option>
+                            <el-option label="精二" value="2"></el-option>
                         </el-select>
                     </td>
                     <td>
@@ -318,8 +318,6 @@
                     ]
                 },
                 operators:[],
-                select_operators: [],
-                stage_visible: false,
                 stage_type_list: stageTypeList,
                 stage_map: stageMap,
                 stage_type: '主线剧情',
@@ -353,10 +351,56 @@
                         return;
                     }
                 }
-                this.$message({
-                    message: '通过验证',
-                    type: 'success'
+                this.executeSubmit();
+            },
+            executeSubmit() {
+                var data = this.getSubmitJson();
+                var _this = this;
+                axios({
+                    url:'/video/save',
+                    method: 'post',
+                    data: data,
+                    headers:{
+                        'Content-Type':'application/json'
+                    }
+                }).then(function(res){
+                    var res = res.data;
+                    if(res.status) {
+                        _this.$message({
+                            message: '保存成功',
+                            type: 'success'
+                        });
+                    } else {
+                        _this.$message.error(res.message);
+                    }
+
+                }).catch(function (error) {
+                    console.info(error);
+                    _this.$message.error("出现未知异常，请联系管理员");
                 });
+            },
+            getSubmitJson() {
+                var obj = {};
+                obj.aid = this.share_form.aid;
+                obj.type = this.share_form.type;
+                obj.stageId = this.share_form.stage_id;
+                if(this.share_form.is_tag) {
+                    obj.totalTag = this.share_form.total_tag;
+                }
+                var arr = [];
+                for(var i = 0; i < this.operators.length; i++) {
+                    var o = this.operators[i];
+                    var newO = {};
+                    newO.operatorId = o.id;
+                    newO.jingying = o.jingying;
+                    newO.level = o.level;
+                    newO.skill = o.skill ? o.skill : 0;
+                    newO.skillLevel = o.skill_level ? o.skill_level : 0;
+                    newO.qianneng = o.qianneng ? o.qianneng : 0;
+                    arr.push(newO);
+                }
+                obj.operatorList = arr;
+                return JSON.stringify(obj);
             },
             clickOperator() {
                 this.$refs.select_operator.show();
@@ -380,12 +424,6 @@
                         this.share_form.is_tag = list[i].isTag;
                         break;
                     }
-                }
-            },
-            digitOnly(e) {
-                let a = e.key.replace(/[^\d]/g, "");
-                if (!a) {
-                    e.preventDefault();
                 }
             },
             confirmOperators(arr) {
@@ -426,16 +464,6 @@
         components: {
             mmenu: Menu, // 注册组件
         },
-        created() {
-//            axios.get('/work/operator/list',{       // 还可以直接把参数拼接在url后边
-//                params:{
-//                }
-//            }).then(function(res){
-//                console.info(res)
-//            }).catch(function (error) {
-//                console.log(error);
-//            });
-        }
     })
 
 

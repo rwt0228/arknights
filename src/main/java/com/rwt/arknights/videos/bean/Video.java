@@ -9,6 +9,7 @@ public class Video {
     private Integer stageId;
     private String title;    //标题
     private String imgUrl;
-    private String type;    //1作业2论文3迫害4其他类型
+    private Integer type;    //1作业2论文3迫害4其他类型
     private String upName;
+    private int totalTag;   //危机合约等级
 }
