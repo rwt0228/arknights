@@ -75,7 +75,7 @@ public class JsonResult {
 
     public static JsonResult Error() {
         JsonResult result = new JsonResult();
-        result.setMessage("异常");
+        result.setMessage("操作失败，请联系管理员");
         result.setStatus(false);
         result.setCode("500");
         return result;

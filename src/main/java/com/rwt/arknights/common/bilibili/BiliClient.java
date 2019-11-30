@@ -8,12 +8,17 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class BiliClient {
 
     private static final String uploaderUrl = "https://api.bilibili.com/x/space/acc/info?mid=";
+    private static final String videoUrl = "https://api.bilibili.com/x/web-interface/view?aid=";
 
 
+    private static String getVideoUrl(int av) {
+        return videoUrl + av;
+    }
     private static String getUploaderUrl(int uid) {
         return uploaderUrl + uid;
     }
@@ -57,4 +62,22 @@ public class BiliClient {
         return content;
     }
 
+    public static VideoInfoDTO getVideoInfoDTO(int av) {
+        String json = doGet(getVideoUrl(av));
+        Map map = (Map<String, Object>) JSONUtils.parse(json);
+        Map data = (Map<String, Object>) map.get("data");
+        VideoInfoDTO dto = new VideoInfoDTO();
+        dto.setAvId(av);
+        dto.setTitle((String) data.get("title"));
+        dto.setPic((String) data.get("pic"));
+        dto.setDesc((String) data.get("desc"));
+        Map owner = (Map) data.get("owner");
+        dto.setUpName((String) owner.get("name"));
+        return dto;
+    }
+
+    public static void main(String[] args) {
+        VideoInfoDTO videoInfoDTO = getVideoInfoDTO(77229177);
+        int cc = 1;
+    }
 }
