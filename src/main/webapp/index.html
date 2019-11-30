@@ -61,7 +61,7 @@
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
-                    <el-form-item label="视频类型" >
+                    <el-form-item label="视频类型" prop="type">
                         <el-select style="width: 100%;" v-model="share_form.type" placeholder="请选择视频类型">
                             <el-option label="作业向" value="1"></el-option>
                             <el-option label="论文向" value="2"></el-option>
@@ -85,7 +85,7 @@
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
-                    <el-form-item label="关卡代号">
+                    <el-form-item label="关卡代号" prop="stage_id">
                         <el-select style="width: 100%;" v-model="share_form.stage_id" placeholder="请先选择关卡代号">
                             <el-option v-for="s in stages" :label="s.code" :value="s.id" v-bind:key="s.id"></el-option>
                         </el-select>
@@ -101,6 +101,7 @@
             </el-row>
             <el-form-item label="选择干员">
                 <el-button type="primary" @click="clickOperator">点击选择</el-button>
+                <span v-show="operators.length > 0" style="color: red">注：精英化和等级为必填，技能、技能等级、潜能等级可以不用填</span>
             </el-form-item>
             <table class="operator-table" cellpadding="0" cellspacing="0" border="1">
                 <tr v-for="o in operators">
@@ -109,19 +110,20 @@
                     </td>
                     <td class="name-label">{{o.name}}</td>
                     <td>
-                        <el-select style="width: 100%;" v-model="o.jingying" placeholder="精英化">
+                        <el-select style="width: 100%;" v-model="o.jingying" placeholder="精英化(必填)">
                             <el-option label="精零" value="1"></el-option>
                             <el-option label="精一" value="2"></el-option>
                             <el-option label="精二" value="3"></el-option>
                         </el-select>
                     </td>
                     <td>
-                        <el-select style="width: 100%;" v-model="o.level" placeholder="等级">
+                        <el-select style="width: 100%;" v-model="o.level" placeholder="等级(必填)">
                             <el-option v-for="i in 90" :label="i" :value="i" v-bind:key="i"></el-option>
                         </el-select>
                     </td>
                     <td>
-                        <el-select style="width: 100%;" v-model="o.skill" placeholder="技能选择">
+                        <el-select style="width: 100%;" v-model="o.skill" placeholder="选择技能">
+                            <el-option label="选择技能" value=""></el-option>
                             <el-option label="一技能" value="1"></el-option>
                             <el-option label="二技能" value="2"></el-option>
                             <el-option label="三技能" value="3"></el-option>
@@ -129,6 +131,7 @@
                     </td>
                     <td>
                         <el-select style="width: 100%;" v-model="o.skill_level" placeholder="技能等级">
+                            <el-option label="技能等级" value=""></el-option>
                             <el-option v-for="i in 7" :label="i" :value="i" v-bind:key="i"></el-option>
                             <el-option label="专精一" value="8"></el-option>
                             <el-option label="专精二" value="9"></el-option>
@@ -136,7 +139,8 @@
                         </el-select>
                     </td>
                     <td>
-                        <el-select style="width: 100%;" v-model="o.qianneng" placeholder="潜能">
+                        <el-select style="width: 100%;" v-model="o.qianneng" placeholder="潜能等级">
+                            <el-option label="潜能等级" value=""></el-option>
                             <el-option label="零潜" value="0"></el-option>
                             <el-option label="一潜" value="1"></el-option>
                             <el-option label="二潜" value="2"></el-option>
@@ -281,13 +285,22 @@
             }
         }
     };
-
     const Share = {
         data() {
+            var checkAid = (rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('请输入av号'));
+                }
+                if (value %1 !== 0) {
+                    callback(new Error('请输入数字值'));
+                } else {
+                    callback();
+                }
+            };
             return {
                 share_form: {
                     aid: null,
-                    type: '',
+                    type: "1",
                     stage_id: 5,
                     total_tag: 1,
                     is_tag: false,
@@ -295,8 +308,14 @@
                 rules: {
                     aid: [
                         { required: true, message: '请输入av号', trigger: 'blur' },
-                        { type: 'number', message: 'av号必须为数字'}
+                        { validator: checkAid, trigger: 'blur' }
                     ],
+                    type: [
+                        { required: true, message: '请选择视频类型', trigger: 'blur' },
+                    ],
+                    stage_id: [
+                        { required: true, message: '请选择关卡代号', trigger: 'blur' },
+                    ]
                 },
                 operators:[],
                 select_operators: [],
@@ -307,14 +326,36 @@
             }
         },
         methods: {
-            onSubmit() {
+            async onSubmit() {
+                var arr = this.operators;
                 this.$refs['share_form'].validate((valid) => {
-                    if (valid) {
-                        alert('submit!');
-                    } else {
-                        alert('error submit!!');
+                    if (!valid) {
                         return false;
                     }
+                });
+                var res = await axios.post('/video/getInfo?aid=' + this.share_form.aid);
+                if(!res.data.status) {
+                    this.$message.error('查询b站视频信息错误，请确认AV号正确');
+                    return;
+                }
+                if(arr.length == 0) {
+                    this.$message.error('至少选择一名干员');
+                    return;
+                }
+                for(var i = 0; i < arr.length; i++) {
+                    var o = arr[i];
+                    if(!o.jingying) {
+                        this.$message.error(o.name + '的精英化不能为空');
+                        return;
+                    }
+                    if(!o.level) {
+                        this.$message.error(o.name + '的干员等级不能为空');
+                        return;
+                    }
+                }
+                this.$message({
+                    message: '通过验证',
+                    type: 'success'
                 });
             },
             clickOperator() {
