@@ -6,31 +6,8 @@
 
     <!-- import CSS -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="/ak.css">
 </head>
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-    }
-
-    a {
-        text-decoration: none;
-    }
-
-    .my-title {
-        float: left;
-        line-height: 61px;
-        font-size: 30px;
-        font-weight: 700;
-        color: wheat;
-        margin: 0 30px;
-    }
-
-    .el-menu-item a {
-        line-height: 61px;
-        display: inline-block;
-    }
-</style>
 <body>
 <div id="app">
     <mmenu></mmenu>
@@ -61,13 +38,13 @@
             <el-button type="warning">排除干员列表</el-button>
             <div style="height: 20px;"></div>
             <el-table border style="width: 100%">
-                <el-table-column prop="av" label="av号"></el-table-column>
-                <el-table-column prop="title" label="标题"></el-table-column>
-                <el-table-column prop="img" label="封面"></el-table-column>
-                <el-table-column prop="stage" label="关卡"></el-table-column>
-                <el-table-column prop="operator" label="干员列表"></el-table-column>
-                <el-table-column prop="level" label="平均等级" sortable></el-table-column>
-                <el-table-column prop="level" label="操作"></el-table-column>
+                <el-table-column align="center" prop="av" label="av号"></el-table-column>
+                <el-table-column align="center" prop="title" label="标题"></el-table-column>
+                <el-table-column align="center" prop="img" label="封面"></el-table-column>
+                <el-table-column align="center" prop="stage" label="关卡"></el-table-column>
+                <el-table-column align="center" prop="operator" label="干员列表"></el-table-column>
+                <el-table-column align="center" prop="level" label="平均等级" sortable></el-table-column>
+                <el-table-column align="center" prop="level" label="操作"></el-table-column>
             </el-table>
         </div>
     </div>
@@ -76,16 +53,16 @@
 <template id="share">
     <div style="padding: 30px; width: 80%; margin: 0 auto">
         <!--表单-->
-        <el-form ref="form" :model="form" label-width="90px">
+        <el-form ref="share_form" :rules="rules" :model="share_form" label-width="90px">
             <el-row>
                 <el-col :span="8">
-                    <el-form-item label="视频av号">
-                        <el-input v-model="form.av_id" ></el-input>
+                    <el-form-item label="视频av号" prop="aid">
+                        <el-input v-model="share_form.aid" ></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
-                    <el-form-item label="视频类型">
-                        <el-select style="width: 100%;" v-model="form.type" placeholder="请选择视频类型">
+                    <el-form-item label="视频类型" >
+                        <el-select style="width: 100%;" v-model="share_form.type" placeholder="请选择视频类型">
                             <el-option label="作业向" value="1"></el-option>
                             <el-option label="论文向" value="2"></el-option>
                             <el-option label="迫害向" value="3"></el-option>
@@ -94,7 +71,7 @@
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
-                    <el-button type="success" plain @click="clickVideoInfo">预览视频信息</el-button>
+                    <el-button type="success" @click="clickVideoInfo">预览视频信息</el-button>
                 </el-col>
             </el-row>
             <el-row>
@@ -109,34 +86,82 @@
                 </el-col>
                 <el-col :span="8">
                     <el-form-item label="关卡代号">
-                        <el-select style="width: 100%;" v-model="form.stage_id" placeholder="请先选择关卡代号">
+                        <el-select style="width: 100%;" v-model="share_form.stage_id" placeholder="请先选择关卡代号">
                             <el-option v-for="s in stages" :label="s.code" :value="s.id" v-bind:key="s.id"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
-                <el-col :span="8" v-show="form.is_tag">
+                <el-col :span="8" v-show="share_form.is_tag">
                     <el-form-item label="合约等级">
-                        <el-select style="width: 100%;" v-model="form.total_tag" placeholder="请先选择合约等级">
+                        <el-select style="width: 100%;" v-model="share_form.total_tag" placeholder="请先选择合约等级">
                             <el-option v-for="i in 35" :label="i" :value="i" v-bind:key="i"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
             </el-row>
             <el-form-item label="选择干员">
-                <el-input readonly @click.native="clickOperator"></el-input>
+                <el-button type="primary" @click="clickOperator">点击选择</el-button>
             </el-form-item>
-        </el-form>
-        <!--选择关卡-->
-        <select-operator ref="select_operator"></select-operator>
+            <table class="operator-table" cellpadding="0" cellspacing="0" border="1">
+                <tr v-for="o in operators">
+                    <td style="width: 40px">
+                        <img :src="o.avatar" style="height:40px;display: inline-block;"/>
+                    </td>
+                    <td class="name-label">{{o.name}}</td>
+                    <td>
+                        <el-select style="width: 100%;" v-model="o.jingying" placeholder="精英化">
+                            <el-option label="精零" value="1"></el-option>
+                            <el-option label="精一" value="2"></el-option>
+                            <el-option label="精二" value="3"></el-option>
+                        </el-select>
+                    </td>
+                    <td>
+                        <el-select style="width: 100%;" v-model="o.level" placeholder="等级">
+                            <el-option v-for="i in 90" :label="i" :value="i" v-bind:key="i"></el-option>
+                        </el-select>
+                    </td>
+                    <td>
+                        <el-select style="width: 100%;" v-model="o.skill" placeholder="技能选择">
+                            <el-option label="一技能" value="1"></el-option>
+                            <el-option label="二技能" value="2"></el-option>
+                            <el-option label="三技能" value="3"></el-option>
+                        </el-select>
+                    </td>
+                    <td>
+                        <el-select style="width: 100%;" v-model="o.skill_level" placeholder="技能等级">
+                            <el-option v-for="i in 7" :label="i" :value="i" v-bind:key="i"></el-option>
+                            <el-option label="专精一" value="8"></el-option>
+                            <el-option label="专精二" value="9"></el-option>
+                            <el-option label="专精" value="10"></el-option>
+                        </el-select>
+                    </td>
+                    <td>
+                        <el-select style="width: 100%;" v-model="o.qianneng" placeholder="潜能">
+                            <el-option label="零潜" value="0"></el-option>
+                            <el-option label="一潜" value="1"></el-option>
+                            <el-option label="二潜" value="2"></el-option>
+                            <el-option label="三潜" value="3"></el-option>
+                            <el-option label="四潜" value="4"></el-option>
+                            <el-option label="五潜" value="5"></el-option>
+                        </el-select>
+                    </td>
+                </tr>
+            </table>
 
-        <video_info ref="video_info"></video_info>
+        </el-form>
+        <el-button style="margin: 20px;" type="primary" @click="onSubmit">上传作业</el-button>
+        <!--选择关卡-->
+        <select-operator ref="select_operator" @confirm="confirmOperators"></select-operator>
+
+        <video_info ref="video_info" ></video_info>
     </div>
 </template>
 <template id="selectOperator">
     <div>
-        <el-dialog title="请选择干员" :visible.sync="visible" width="30%">
+        <el-dialog title="请选择干员" :visible.sync="visible" width="30%" :close-on-click-modal=false>
+            <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
             <el-tree :data="data" accordion show-checkbox node-key="id" ref="tree" highlight-current
-                     :props="defaultProps">
+                     :props="defaultProps" :filter-node-method="filterNode">
               <span class="custom-tree-node" slot-scope="{ node, data }">
                 <span><img style="height: 19.2px; vertical-align: top;" :src="data.avatar"/></span>
                 <span>{{ node.label }}</span>
@@ -144,7 +169,7 @@
             </el-tree>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="visible = false">取 消</el-button>
-                <el-button type="primary" @click="visible = false">确 定</el-button>
+                <el-button type="primary" @click="confirm">确 定</el-button>
              </span>
         </el-dialog>
     </div>
@@ -217,6 +242,7 @@
         template: '#selectOperator',
         data() {
             return {
+                filterText: '',
                 visible: false,
                 data: operators,
                 defaultProps: {
@@ -228,6 +254,30 @@
         methods: {
             show() {
                 this.visible = true;
+            },
+            filterNode(value, data) {
+                if (!value) return true;
+                return data.name.indexOf(value) !== -1;
+            },
+            confirm() {
+                var arr = this.$refs.tree.getCheckedNodes();
+                for (var i = 0; i < arr.length; i++) {
+                    if (!arr[i].id) {
+                        arr.splice(i, 1); // 将使后面的元素依次前移，数组长度减1
+                        i--; // 如果不减，将漏掉一个元素
+                    }
+                }
+                if(arr.length > 13) {
+                    this.$message.error('最多加入13名干员');
+                    return;
+                }
+                this.$emit('confirm',arr);
+                this.visible = false;
+            }
+        },
+        watch: {
+            filterText(val) {
+                this.$refs.tree.filter(val);
             }
         }
     };
@@ -235,13 +285,21 @@
     const Share = {
         data() {
             return {
-                form: {
-                    av_id: '',
+                share_form: {
+                    aid: null,
                     type: '',
                     stage_id: 5,
                     total_tag: 1,
                     is_tag: false,
                 },
+                rules: {
+                    aid: [
+                        { required: true, message: '请输入av号', trigger: 'blur' },
+                        { type: 'number', message: 'av号必须为数字'}
+                    ],
+                },
+                operators:[],
+                select_operators: [],
                 stage_visible: false,
                 stage_type_list: stageTypeList,
                 stage_map: stageMap,
@@ -250,28 +308,35 @@
         },
         methods: {
             onSubmit() {
-                console.log('submit!');
+                this.$refs['share_form'].validate((valid) => {
+                    if (valid) {
+                        alert('submit!');
+                    } else {
+                        alert('error submit!!');
+                        return false;
+                    }
+                });
             },
             clickOperator() {
                 this.$refs.select_operator.show();
             },
             clickVideoInfo() {
-                if (!this.form.av_id) {
+                if (!this.share_form.aid) {
                     this.$message({
                         message: '请先输入AV号',
                         type: 'warning'
                     });
                     return;
                 }
-                this.$refs.video_info.show(this.form.av_id);
+                this.$refs.video_info.show(this.share_form.aid);
             },
             changeType() {
-                this.form.stage_id = this.stage_map[this.stage_type][0].id;
+                this.share_form.stage_id = this.stage_map[this.stage_type][0].id;
                 var list = this.stage_type_list;
                 var type = this.stage_type;
                 for (var i = 0; i < list.length; i++) {
                     if (list[i].description == type) {
-                        this.form.is_tag = list[i].isTag;
+                        this.share_form.is_tag = list[i].isTag;
                         break;
                     }
                 }
@@ -281,6 +346,9 @@
                 if (!a) {
                     e.preventDefault();
                 }
+            },
+            confirmOperators(arr) {
+                this.operators = arr;
             }
         },
         computed: {

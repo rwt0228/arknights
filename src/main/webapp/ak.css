@@ -1,0 +1,41 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+.my-title {
+    float: left;
+    line-height: 61px;
+    font-size: 30px;
+    font-weight: 700;
+    color: wheat;
+    margin: 0 30px;
+}
+
+.el-menu-item a {
+    line-height: 61px;
+    display: inline-block;
+}
+
+
+.operator-table{
+    width: 75%;
+    margin-left: 20px;
+    text-align: center;
+}
+.operator-table img{
+    vertical-align: top;
+    display: inline-block;
+    height: 40px;
+}
+
+.operator-table .name-label {
+    font-size: 25px;
+    background-color: rgba(0, 0, 0, 0.63);
+    color: white;
+    min-width: 120px;
+}
