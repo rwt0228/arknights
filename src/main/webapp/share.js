@@ -158,6 +158,7 @@ const Share = {
                         message: '保存成功',
                         type: 'success'
                     });
+                    setTimeout(function(){history.go(0) }, 2000);
                 } else {
                     _this.$message.error(res.message);
                 }

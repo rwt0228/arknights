@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="referrer" content="never">
-
+    <title>明日方舟作战记录馆</title>
     <!-- import CSS -->
     <link rel="stylesheet" href="/css/element-ui.css">
     <link rel="stylesheet" href="/ak.css">
@@ -143,17 +143,17 @@
         <el-dialog title="干员信息详情" :visible.sync="visible" width="50%">
             <div class="operator-row">
                 <span style="width: 40px;"></span>
-                <span style="width: 120px">姓名</span>
-                <span style="width: 150px">等级</span>
-                <span style="width: 150px">技能</span>
-                <span style="width: 120px">潜能</span>
+                <span style="width: 100px">姓名</span>
+                <span style="width: 130px">等级</span>
+                <span style="width: 130px">技能</span>
+                <span style="width: 100px">潜能</span>
             </div>
             <div class="operator-row" v-for="o in operators">
                 <img :src="o.avatar" style="height:40px;display: inline-block;vertical-align: top"/>
-                <span style="width: 120px">{{o.name}}</span>
-                <span style="width: 150px">{{o.jingying | jingying}}{{o.level | level}}</span>
-                <span style="width: 150px">{{o.skill |skill }}-{{o.skillLevel | skillLevel}}</span>
-                <span style="width: 120px">{{o.qianneng | qianneng}}</span>
+                <span style="width: 100px">{{o.name}}</span>
+                <span style="width: 130px">{{o.jingying | jingying}}{{o.level | level}}</span>
+                <span style="width: 130px">{{o.skill |skill }}-{{o.skillLevel | skillLevel}}</span>
+                <span style="width: 100px">{{o.qianneng | qianneng}}</span>
             </div>
         </el-dialog>
     </div>
@@ -238,7 +238,7 @@
                     </el-form-item>
                 </el-col>
                 <el-col :span="8" v-show="share_form.is_tag">
-                    <el-form-item label="最低合约等级">
+                    <el-form-item label="合约等级">
                         <el-select style="width: 100%;" v-model="share_form.total_tag" placeholder="请选择合约等级">
                             <el-option v-for="i in 35" :label="i" :value="i" v-bind:key="i"></el-option>
                         </el-select>
@@ -466,7 +466,7 @@
                 return arr[value];
             },
             skillLevel(value) {
-                var arr=["略","rank1","rank2","rank3","rank4","rank5","rank6","rank7","专精一","专精二","专精三"];
+                var arr=["略","rank1","rank2","rank3","rank4","rank5","rank6","rank7","专一","专二","专三"];
                 return arr[value];
             },
             qianneng(value) {
