@@ -135,7 +135,7 @@
                             <el-option v-for="i in 7" :label="i" :value="i" v-bind:key="i"></el-option>
                             <el-option label="专精一" value="8"></el-option>
                             <el-option label="专精二" value="9"></el-option>
-                            <el-option label="专精" value="10"></el-option>
+                            <el-option label="专精三" value="10"></el-option>
                         </el-select>
                     </td>
                     <td>
@@ -356,6 +356,12 @@
             executeSubmit() {
                 var data = this.getSubmitJson();
                 var _this = this;
+                const loading = this.$loading({
+                    lock: true,
+                    text: '正在提交数据',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
                 axios({
                     url:'/video/save',
                     method: 'post',
@@ -373,10 +379,12 @@
                     } else {
                         _this.$message.error(res.message);
                     }
+                    loading.close();
 
                 }).catch(function (error) {
                     console.info(error);
                     _this.$message.error("出现未知异常，请联系管理员");
+                    loading.close();
                 });
             },
             getSubmitJson() {
