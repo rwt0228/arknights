@@ -17,4 +17,5 @@ public class VideoVO {
     private int avgLevel;
     private String minLevel;
     private Double avgStar;
+    private int totalTag;
 }

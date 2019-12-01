@@ -9,9 +9,10 @@
         <result property="imgUrl" column="img_url"></result>
         <result property="desc" column="desc"></result>
         <result property="stage" column="stage"></result>
-        <result property="avgLevel" column="avgLevel"></result>
-        <result property="minLevel" column="minLevel"></result>
-        <result property="avgStar" column="avgStar"></result>
+        <result property="avgLevel" column="avg_level"></result>
+        <result property="minLevel" column="min_level"></result>
+        <result property="avgStar" column="avg_star"></result>
+        <result property="totalTag" column="total_tag"></result>
         <!--映射关系，指定属性与属性的类型-->
         <collection  property="operators" ofType="com.rwt.arknights.videos.vo.OperatorVO">
             <id property="operatorId" column="operator_id"></id>
@@ -97,7 +98,7 @@
     </select>
 
     <select id="selectVideoVOByListId" resultMap="pageVO">
-        select v.aid, v.title, v.up_name, v.desc,  v.total_tag, v.img_url,
+        select v.aid, v.title, v.up_name, v.desc,  v.total_tag, v.img_url, v.total_tag,
         s.code as stage, vlr.avg_level, vlr.min_level, vlr.avg_star,
         o.id as operator_id, o.name, o.avatar, lor.jingying, lor.level, lor.skill, lor.skill_level, lor.qianneng
         from video v
