@@ -91,7 +91,7 @@
             <if test="dto.stageId != 0">
                 v.stage_id = #{dto.stageId}
             </if>
-            <if test="dto.isTag">
+            <if test="dto.isTag == 1">
                 and v.total_tag > #{dto.minTag}
             </if>
             and (t1.num1 = t3.nums or (t1.num1 = t3.nums - 1 and t2.num2 > 0))

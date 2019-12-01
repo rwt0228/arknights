@@ -9,6 +9,6 @@ public class RouteConfig {
 
     static Map<String, String> routeMap = new HashMap<>();
     static {
-        routeMap.put("/", "/index");
+//        routeMap.put("/", "/index");
     }
 }

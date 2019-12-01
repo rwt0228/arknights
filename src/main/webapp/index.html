@@ -541,7 +541,7 @@
                 var obj = {};
                 obj.stageId = this.query_form.stage_id;
                 obj.minTag = this.query_form.total_tag;
-                obj.isTag = this.query_form.is_tag;
+                obj.isTag = this.query_form.is_tag ? 1 : 0;
                 obj.aid = aidArr;
                 obj.exclude = excludeArr;
                 return obj;
