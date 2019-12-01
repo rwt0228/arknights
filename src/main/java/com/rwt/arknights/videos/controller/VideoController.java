@@ -2,6 +2,7 @@ package com.rwt.arknights.videos.controller;
 
 import com.rwt.arknights.common.bilibili.BiliClient;
 import com.rwt.arknights.common.bilibili.VideoInfoDTO;
+import com.rwt.arknights.log.service.LogService;
 import com.rwt.arknights.videos.dto.NewVideoDTO;
 import com.rwt.arknights.videos.service.VideoService;
 import com.rwt.arknights.web.bean.JsonResult;
@@ -10,12 +11,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RequestMapping("/video")
 @RestController
 public class VideoController {
 
     @Autowired
     private VideoService videoService;
+    @Autowired
+    private LogService logService;
 
     @RequestMapping("/getInfo")
     public JsonResult getInfo(Integer aid) {
@@ -24,7 +29,8 @@ public class VideoController {
     }
 
     @RequestMapping("/save")
-    public JsonResult save(@RequestBody NewVideoDTO dto) {
+    public JsonResult save(@RequestBody NewVideoDTO dto, HttpServletRequest request) {
+        logService.addNewVideo(dto, request);
         videoService.saveNewVideo(dto);
         return JsonResult.OK();
     }

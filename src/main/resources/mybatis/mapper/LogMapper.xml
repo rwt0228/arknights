@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rwt.arknights.log.dao.LogMapper" >
+
+    <sql id="Base_Column">
+      id,ip,content, add_time
+    </sql>
+    <sql id="Noid_Base_Column">
+        ip,content, add_time
+    </sql>
+
+    <insert id="save" parameterType="com.rwt.arknights.log.bean.Log">
+        insert into log
+        (<include refid="Noid_Base_Column" /> )
+        VALUES
+        (#{ip},#{content},#{addTime})
+    </insert>
+
+
+</mapper>
