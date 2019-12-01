@@ -134,13 +134,30 @@
     </div>
 </template>
 <template id="operatorTableItem">
-    <div style="position: relative;">
-        <span style="color: blue; text-decoration: underline; cursor: pointer;">
+    <div>
+        <div style="position: relative;">
+        <span style="color: blue; text-decoration: underline; cursor: pointer;" @click="visible=true">
             {{names}}
         </span>
+        </div>
+        <el-dialog title="干员信息详情" :visible.sync="visible" width="50%">
+            <div class="operator-row">
+                <span style="width: 40px;"></span>
+                <span style="width: 120px">姓名</span>
+                <span style="width: 150px">等级</span>
+                <span style="width: 150px">技能</span>
+                <span style="width: 120px">潜能</span>
+            </div>
+            <div class="operator-row" v-for="o in operators">
+                <img :src="o.avatar" style="height:40px;display: inline-block;vertical-align: top"/>
+                <span style="width: 120px">{{o.name}}</span>
+                <span style="width: 150px">{{o.jingying | jingying}}{{o.level | level}}</span>
+                <span style="width: 150px">{{o.skill |skill }}-{{o.skillLevel | skillLevel}}</span>
+                <span style="width: 120px">{{o.qianneng | qianneng}}</span>
+            </div>
+        </el-dialog>
     </div>
 </template>
-
 <template id="excludeOperator">
     <div>
         <el-dialog title="请选择不参战干员" :visible.sync="visible" width="30%" :close-on-click-modal=false>
@@ -275,7 +292,7 @@
                             <el-option label="二潜" value="2"></el-option>
                             <el-option label="三潜" value="3"></el-option>
                             <el-option label="四潜" value="4"></el-option>
-                            <el-option label="五潜" value="5"></el-option>
+                            <el-option label="满潜" value="5"></el-option>
                         </el-select>
                     </td>
                 </tr>
@@ -421,7 +438,7 @@
     const OperatorTableItem = {
         data(){
             return {
-
+                visible: false,
             }
         },
         computed: {
@@ -436,8 +453,29 @@
                 return s;
             }
         },
+        filters: {
+            jingying(value) {
+                var arr=["精零","精一","精二"];
+                return arr[value];
+            },
+            level(value) {
+                return value + "级";
+            },
+            skill(value) {
+                var arr=["略","一技能","二技能","三技能"];
+                return arr[value];
+            },
+            skillLevel(value) {
+                var arr=["略","rank1","rank2","rank3","rank4","rank5","rank6","rank7","专精一","专精二","专精三"];
+                return arr[value];
+            },
+            qianneng(value) {
+                var arr = ["略","一潜","二潜","三潜","四潜","满潜"];
+                return arr[value];
+            }
+        },
         props: ['operators'],
-        template: '#operatorTableItem'
+        template: '#operatorTableItem',
     }
     const Copy = {
         data() {

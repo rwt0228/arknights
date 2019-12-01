@@ -39,3 +39,17 @@ a {
     color: white;
     min-width: 120px;
 }
+
+.operator-row {
+    text-align: left;
+    line-height: 40px;
+    font-size: 23px;
+    vertical-align: top;
+    border: 1px solid #999;
+    background-color: #515151;
+    color: white;
+    font-weight: 400;
+}
+.operator-row span {
+    display: inline-block;
+}
