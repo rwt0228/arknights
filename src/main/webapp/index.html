@@ -35,7 +35,50 @@
 <template id="copy">
     <div style="padding: 30px">
         <div>
-            <el-button type="warning">排除干员列表</el-button>
+            <el-form ref="query_form" :model="query_form" label-width="90px">
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item label="关卡类型">
+                            <el-select style="width: 100%;" v-model="stage_type" @change="changeType()"
+                                       placeholder="请选择关卡类型">
+                                <el-option v-for="type in stage_type_list" :label="type.description"
+                                           :value="type.description" v-bind:key="type.id"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="关卡代号">
+                            <el-select style="width: 100%;" v-model="query_form.stage_id" placeholder="请选择关卡代号">
+                                <el-option v-for="s in stages" :label="s.code" :value="s.id" v-bind:key="s.id"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8" v-show="query_form.is_tag">
+                        <el-form-item label="最低等级">
+                            <el-select style="width: 100%;" v-model="query_form.total_tag" placeholder="请选择合约等级">
+                                <el-option v-for="i in 35" :label="i" :value="i" v-bind:key="i"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item label="排除干员">
+                            <el-input v-model="query_form.exclude_txt" @click.native="clickEclude" placeholder="选择自己没有的干员"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="支援干员">
+                            <el-input v-model="query_form.aid_txt" @click.native="clickAid" placeholder="选择可供支援的好友干员"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-button type="primary" style="margin-left:20px" @click="query">点击查询</el-button>
+                    </el-col>
+                </el-row>
+
+            </el-form>
+
             <div style="height: 20px;"></div>
             <el-table border style="width: 100%">
                 <el-table-column align="center" prop="av" label="av号"></el-table-column>
@@ -47,9 +90,49 @@
                 <el-table-column align="center" prop="level" label="操作"></el-table-column>
             </el-table>
         </div>
+
+        <exclude-operator ref="exclude_operator" @confirm="confirmExclude"></exclude-operator>
+        <aid-operator ref="aid_operator" @confirm="confirmAid"></aid-operator>
+
     </div>
 </template>
 
+<template id="excludeOperator">
+    <div>
+        <el-dialog title="请选择不参战干员" :visible.sync="visible" width="30%" :close-on-click-modal=false>
+            <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+            <el-tree :data="data" accordion show-checkbox node-key="id" ref="tree" highlight-current
+                     :props="defaultProps" :filter-node-method="filterNode">
+              <span class="custom-tree-node" slot-scope="{ node, data }">
+                <span><img style="height: 19.2px; vertical-align: top;" :src="data.avatar"/></span>
+                <span>{{ node.label }}</span>
+              </span>
+            </el-tree>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="visible = false">取 消</el-button>
+                <el-button type="primary" @click="confirm">确 定</el-button>
+             </span>
+        </el-dialog>
+    </div>
+</template>
+<template id="aidOperator">
+    <div>
+        <el-dialog title="请选择好友支援干员" :visible.sync="visible" width="30%" :close-on-click-modal=false>
+            <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+            <el-tree :data="data" accordion show-checkbox node-key="id" ref="tree" highlight-current
+                     :props="defaultProps" :filter-node-method="filterNode">
+              <span class="custom-tree-node" slot-scope="{ node, data }">
+                <span><img style="height: 19.2px; vertical-align: top;" :src="data.avatar"/></span>
+                <span>{{ node.label }}</span>
+              </span>
+            </el-tree>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="visible = false">取 消</el-button>
+                <el-button type="primary" @click="confirm">确 定</el-button>
+             </span>
+        </el-dialog>
+    </div>
+</template>
 
 <!--我要写作业的视图-->
 <template id="share">
@@ -88,14 +171,14 @@
                 </el-col>
                 <el-col :span="8">
                     <el-form-item label="关卡代号" prop="stage_id">
-                        <el-select style="width: 100%;" v-model="share_form.stage_id" placeholder="请先选择关卡代号">
+                        <el-select style="width: 100%;" v-model="share_form.stage_id" placeholder="请选择关卡代号">
                             <el-option v-for="s in stages" :label="s.code" :value="s.id" v-bind:key="s.id"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
                 <el-col :span="8" v-show="share_form.is_tag">
-                    <el-form-item label="合约等级">
-                        <el-select style="width: 100%;" v-model="share_form.total_tag" placeholder="请先选择合约等级">
+                    <el-form-item label="最低合约等级">
+                        <el-select style="width: 100%;" v-model="share_form.total_tag" placeholder="请选择合约等级">
                             <el-option v-for="i in 35" :label="i" :value="i" v-bind:key="i"></el-option>
                         </el-select>
                     </el-form-item>
@@ -220,7 +303,154 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 
-    const Copy = {template: '#copy'};
+    const ExcludeOperator = {
+        template: '#excludeOperator',
+        data() {
+            return {
+                filterText: '',
+                visible: false,
+                data: operators,
+                defaultProps: {
+                    children: 'children',
+                    label: 'name',
+                }
+            }
+        },
+        methods: {
+            show() {
+                this.visible = true;
+            },
+            filterNode(value, data) {
+                if (!value) return true;
+                return data.name.indexOf(value) !== -1;
+            },
+            confirm() {
+                var arr = this.$refs.tree.getCheckedNodes();
+                for (var i = 0; i < arr.length; i++) {
+                    if (!arr[i].id) {
+                        arr.splice(i, 1); // 将使后面的元素依次前移，数组长度减1
+                        i--; // 如果不减，将漏掉一个元素
+                    }
+                }
+                this.$emit('confirm',arr);
+                this.visible = false;
+            }
+        },
+        watch: {
+            filterText(val) {
+                this.$refs.tree.filter(val);
+            }
+        }
+    };
+    const AidOperator = {
+        template: '#aidOperator',
+        data() {
+            return {
+                filterText: '',
+                visible: false,
+                data: operators,
+                defaultProps: {
+                    children: 'children',
+                    label: 'name',
+                }
+            }
+        },
+        methods: {
+            show() {
+                this.visible = true;
+            },
+            filterNode(value, data) {
+                if (!value) return true;
+                return data.name.indexOf(value) !== -1;
+            },
+            confirm() {
+                var arr = this.$refs.tree.getCheckedNodes();
+                for (var i = 0; i < arr.length; i++) {
+                    if (!arr[i].id) {
+                        arr.splice(i, 1); // 将使后面的元素依次前移，数组长度减1
+                        i--; // 如果不减，将漏掉一个元素
+                    }
+                }
+                this.$emit('confirm',arr);
+                this.visible = false;
+            }
+        },
+        watch: {
+            filterText(val) {
+                this.$refs.tree.filter(val);
+            }
+        }
+    };
+    const Copy = {
+        data() {
+            return {
+                query_form: {
+                    stage_id: 5,
+                    total_tag: 1,
+                    is_tag: false,
+                    exclude_txt: '',
+                    aid_txt: '',
+                    exclude: [],
+                    aid: [],
+                },
+                stage_type_list: stageTypeList,
+                stage_map: stageMap,
+                stage_type: '主线剧情',
+            }
+        },
+        methods: {
+            query() {
+                console.info(this.query_form);
+            },
+            changeType() {
+                this.query_form.stage_id = this.stage_map[this.stage_type][0].id;
+                var list = this.stage_type_list;
+                var type = this.stage_type;
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i].description == type) {
+                        this.query_form.is_tag = list[i].isTag;
+                        break;
+                    }
+                }
+            },
+            clickEclude() {
+                this.$refs.exclude_operator.show();
+            },
+            confirmExclude(arr) {
+                if(arr.length > 0) {
+                    this.query_form.exclude_txt = arr[0].name + "等" + arr.length + "名干员";
+                } else {
+                    this.query_form.exclude_txt = "";
+                }
+
+                this.query_form.exclude = arr;
+            },
+            clickAid() {
+                this.$refs.aid_operator.show();
+            },
+            confirmAid(arr) {
+                if(arr.length > 0) {
+                    this.query_form.aid_txt = arr[0].name + "等" + arr.length + "名干员";
+                } else {
+                    this.query_form.aid_txt = "";
+                }
+
+                this.query_form.aid = arr;
+            }
+        },
+        computed: {
+            stages: function () {
+                return stageMap[this.stage_type];
+            }
+        },
+        components: {
+            'exclude-operator': ExcludeOperator,
+            'aid-operator': AidOperator,
+        },
+        template: '#copy'
+    };
+
+
     const Menu = {
         data() {
             return {
