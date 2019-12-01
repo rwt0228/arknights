@@ -10,4 +10,5 @@ public class OperatorInfoDTO {
     private int skill;
     private int skillLevel;
     private int qianneng;
+    private int star;
 }

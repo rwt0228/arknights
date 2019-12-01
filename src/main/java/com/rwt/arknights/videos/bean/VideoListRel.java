@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class VideoListRel {
     private Integer id;
-    private Integer avId;
+    private Integer aid;
     private Integer operatorNum;
-    private Integer totalStar;
-    private Integer minLevel;
-    private Integer AvgLevel;
+    private Double avgStar;
+    private String  minLevel;
+    private Integer avgLevel;
 }

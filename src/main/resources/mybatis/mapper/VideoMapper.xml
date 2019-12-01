@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rwt.arknights.videos.dao.VideoMapper" >
+
+    <sql id="Base_Column">
+      aid,`desc`,stage_id,title,img_url,`type`,up_name,total_tag
+    </sql>
+
+
+
+    <select id="selectByAid" resultType="com.rwt.arknights.videos.bean.Video">
+        select *
+        from video
+        where aid = #{aid}
+    </select>
+    
+    <insert id="save" parameterType="com.rwt.arknights.videos.bean.Video">
+        insert into video (<include refid="Base_Column" />)
+        VALUES (#{aid},#{desc},#{stageId},#{title},#{imgUrl},#{type},#{upName},#{totalTag})
+    </insert>
+</mapper>

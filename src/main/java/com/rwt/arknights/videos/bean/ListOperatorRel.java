@@ -9,7 +9,7 @@ public class ListOperatorRel {
     private Integer operatorId;
     private Integer jingying;
     private Integer level;
-    private String skill;
+    private String  skill;
     private Integer skillLevel;
     private Integer qianneng;
 

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rwt.arknights.videos.dao.VideoListRelMapper" >
+
+    <sql id="Base_Column">
+      id,aid,operator_num,avg_star,min_level,avg_level
+    </sql>
+    <sql id="Noid_Base_Column">
+        aid,operator_num,avg_star,min_level,avg_level
+    </sql>
+
+    <insert id="save" parameterType="com.rwt.arknights.videos.bean.VideoListRel">
+        <selectKey keyProperty="id" order="AFTER" resultType="Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into video_list_rel (<include refid="Noid_Base_Column" />)
+        VALUES (#{aid},#{operatorNum},#{avgStar},#{minLevel},#{avgLevel})
+    </insert>
+</mapper>

@@ -12,6 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(CustomException.class)
+    @ResponseBody //在返回自定义相应类的情况下必须有，这是@ControllerAdvice注解的规定
+    public JsonResult customExceptionHandler(RuntimeException e, HttpServletResponse response) {
+        return JsonResult.Error(e.getMessage());
+    }
+
     @ExceptionHandler(RuntimeException.class)
     @ResponseBody //在返回自定义相应类的情况下必须有，这是@ControllerAdvice注解的规定
     public JsonResult exceptionHandler(RuntimeException e, HttpServletResponse response) {

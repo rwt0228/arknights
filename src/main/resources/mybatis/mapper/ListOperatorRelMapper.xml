@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rwt.arknights.videos.dao.ListOperatorRelMapper" >
+
+    <sql id="Base_Column">
+      id,list_id,operator_id,jingying,skill,skill_level,`level`,qianneng
+    </sql>
+    <sql id="Noid_Base_Column">
+      list_id,operator_id,jingying,skill,skill_level,`level`,qianneng
+    </sql>
+
+
+    <insert id="saveList" parameterType="java.util.List">
+        insert into list_operator_rel
+         (<include refid="Noid_Base_Column"/>)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.listId},
+            #{item.operatorId},
+            #{item.jingying},
+            #{item.skill},
+            #{item.skillLevel},
+            #{item.level},
+            #{item.qianneng}
+            )
+        </foreach>
+    </insert>
+</mapper>
