@@ -5,8 +5,16 @@
     <meta name="referrer" content="never">
 
     <!-- import CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="/css/element-ui.css">
     <link rel="stylesheet" href="/ak.css">
+    <!--<script src="/js/vue.min.js"></script>-->
+    <script src="/operators.js"></script>
+    <script src="/stage.js"></script>
+    <script src="/share.js"></script>
+    <script src="/js/vue.js"></script>
+    <script src="/js/elemeui.js"></script>
+    <script src="/js/vue-router.js"></script>
+    <script src="/js/axios.min.js"></script>
 </head>
 <body>
 <div id="app">
@@ -82,8 +90,8 @@
             <div style="height: 20px;"></div>
 
             <el-table :data="tableData" border style="width: 100%">
-                <el-table-column align="center" prop="aid" label="av号" width="60"></el-table-column>
-                <el-table-column align="center" prop="upName" label="up主" width="60"></el-table-column>
+                <el-table-column align="center" prop="aid" label="av号" ></el-table-column>
+                <el-table-column align="center" prop="upName" label="up主" ></el-table-column>
                 <el-table-column align="center" prop="title" label="标题">
                     <template slot-scope="scope">
                         <span :title="scope.row.title">{{scope.row.title | longTxt}}</span>
@@ -99,16 +107,20 @@
                         <span :title="scope.row.desc">{{scope.row.desc | longTxt}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" prop="stage" label="关卡代号"  width="90"></el-table-column>
-                <el-table-column align="center" prop="totalTag" label="合约等级"  width="90">
+                <el-table-column align="center" prop="stage" label="关卡代号"  ></el-table-column>
+                <el-table-column align="center" prop="totalTag" label="合约等级"  >
                     <template slot-scope="scope">
                         <span :title="scope.row.totalTag">{{scope.row.totalTag | tag}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" prop="aaa" label="干员列表"></el-table-column>
-                <el-table-column align="center" prop="avgLevel" label="平均等级"  width="90"></el-table-column>
-                <el-table-column align="center" prop="avgStar" label="平均星数"  width="90"></el-table-column>
-                <el-table-column align="center" label="操作"  width="90">
+                <el-table-column align="center" prop="aaa" label="干员列表">
+                    <template slot-scope="scope">
+                        <operator-table-item :operators="scope.row.operators"></operator-table-item>
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" prop="avgLevel" label="平均等级"  ></el-table-column>
+                <el-table-column align="center" prop="avgStar" label="平均星数"  ></el-table-column>
+                <el-table-column align="center" label="操作"  >
                     <template slot-scope="scope">
                         <el-button size="mini" type="primary" @click="jumpBili(scope.$index, scope.row)">跳转B站</el-button>
                     </template>
@@ -119,6 +131,13 @@
         <exclude-operator ref="exclude_operator" @confirm="confirmExclude"></exclude-operator>
         <aid-operator ref="aid_operator" @confirm="confirmAid"></aid-operator>
 
+    </div>
+</template>
+<template id="operatorTableItem">
+    <div style="position: relative;">
+        <span style="color: blue; text-decoration: underline; cursor: pointer;">
+            {{names}}
+        </span>
     </div>
 </template>
 
@@ -318,14 +337,7 @@
 
 
 </body>
-<!--<script src="/js/vue.min.js"></script>-->
-<script src="/operators.js"></script>
-<script src="/stage.js"></script>
-<script src="/share.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
 <script>
     const ExcludeOperator = {
         template: '#excludeOperator',
@@ -405,6 +417,28 @@
             }
         }
     };
+
+    const OperatorTableItem = {
+        data(){
+            return {
+
+            }
+        },
+        computed: {
+            names: function () {
+                var s = "";
+                for(var i = 0; i < this.operators.length; i++) {
+                    if(s) {
+                        s += ",";
+                    }
+                    s += this.operators[i].name;
+                }
+                return s;
+            }
+        },
+        props: ['operators'],
+        template: '#operatorTableItem'
+    }
     const Copy = {
         data() {
             var stageTypeListCopy = JSON.parse(JSON.stringify(stageTypeList));
@@ -442,7 +476,6 @@
                 }).then(function(res){
                     var res = res.data;
                     if(res.status) {
-                        console.info(res.data);
                         _this.tableData = res.data;
                     } else {
                         _this.$message.error(res.message);
@@ -455,11 +488,13 @@
             getQueryData() {
                 var aidArr = [];
                 var excludeArr = [];
-                for(var i = 0; i < this.query_form.aid.length; i++) {
-                    aidArr.push[this.query_form.aid[i].id];
+                var taid = this.query_form.aid;
+                var texclude = this.query_form.exclude;
+                for(var i = 0; i < taid.length; i++) {
+                    aidArr.push(taid[i].id);
                 }
-                for(var i = 0; i < this.query_form.exclude.length; i++) {
-                    aidArr.push[this.query_form.exclude[i].id];
+                for(var i = 0; i < texclude.length; i++) {
+                    excludeArr.push(texclude[i].id);
                 }
                 var obj = {};
                 obj.stageId = this.query_form.stage_id;
@@ -537,6 +572,7 @@
         components: {
             'exclude-operator': ExcludeOperator,
             'aid-operator': AidOperator,
+            'operator-table-item': OperatorTableItem,
         },
         template: '#copy'
     };

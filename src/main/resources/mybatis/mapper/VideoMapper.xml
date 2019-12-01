@@ -74,6 +74,9 @@
                   </foreach>
                   )
               </if>
+              <if test="dto.aid == null or dto.aid.size() == 0">
+                  and 1 = 2
+              </if>
             </where>
 
             group by vlr.aid
@@ -97,7 +100,7 @@
         limit #{dto.pageNo} ,10
     </select>
 
-    <select id="selectVideoVOByListId" resultMap="pageVO">
+    <select id="selectVideoVOByListId" resultMap="pageVO" parameterType="list">
         select v.aid, v.title, v.up_name, v.desc,  v.total_tag, v.img_url, v.total_tag,
         s.code as stage, vlr.avg_level, vlr.min_level, vlr.avg_star,
         o.id as operator_id, o.name, o.avatar, lor.jingying, lor.level, lor.skill, lor.skill_level, lor.qianneng
@@ -106,6 +109,11 @@
         inner join video_list_rel vlr on v.aid = vlr.aid
         inner join list_operator_rel lor on lor.list_id = vlr.id
         inner join operator o on o.id = lor.operator_id
+        where v.aid in (
+        <foreach collection="list" item="item" index="index" separator=",">
+            #{item}
+        </foreach>
+        )
         order by vlr.avg_level
     </select>
 </mapper>
