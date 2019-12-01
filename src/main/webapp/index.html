@@ -89,7 +89,7 @@
 
             <div style="height: 20px;"></div>
 
-            <el-table :data="tableData" border style="width: 100%">
+            <el-table :data="tableData.slice((currpage-1)*pagesize,currpage*pagesize)" border style="width: 100%">
                 <el-table-column align="center" prop="aid" label="av号" ></el-table-column>
                 <el-table-column align="center" prop="upName" label="up主" ></el-table-column>
                 <el-table-column align="center" prop="title" label="标题">
@@ -126,6 +126,9 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <el-pagination :page-size="pagesize" :pager-count="5" :current-page="currpage"
+                           @current-change="handleCurrentChange" layout="prev, pager, next" :total="tableData.length">
+            </el-pagination>
         </div>
 
         <exclude-operator ref="exclude_operator" @confirm="confirmExclude"></exclude-operator>
@@ -492,12 +495,13 @@
                     aid_txt: '',
                     exclude: [],
                     aid: [],
-                    pageNo: 1,
                 },
                 stage_type_list: stageTypeListCopy,
                 stage_map: stageMapCopy,
                 stage_type: '不限',
                 tableData: [],
+                currpage: 1,
+                pagesize: 5,
             }
         },
         methods: {
@@ -538,7 +542,6 @@
                 obj.stageId = this.query_form.stage_id;
                 obj.minTag = this.query_form.total_tag;
                 obj.isTag = this.query_form.is_tag;
-                obj.pageNo = this.query_form.pageNo;
                 obj.aid = aidArr;
                 obj.exclude = excludeArr;
                 return obj;
@@ -582,6 +585,9 @@
                 var aid = row.aid;
                 window.open("https://www.bilibili.com/video/av" + aid);
             },
+            handleCurrentChange(val) {
+                this.currpage = val;
+            }
         },
         computed: {
             stages: function () {

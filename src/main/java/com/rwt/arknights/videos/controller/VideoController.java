@@ -43,8 +43,6 @@ public class VideoController {
 
     @RequestMapping("/page")
     public JsonResult page(@RequestBody QueryDTO dto) {
-        int pageNo = dto.getPageNo();
-        dto.setPageNo((pageNo - 1) * 10);
         List<VideoVO> videoVOS = videoService.selectPageVO(dto);
         return JsonResult.OK( videoVOS);
     }

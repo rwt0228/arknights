@@ -96,8 +96,6 @@
             </if>
             and (t1.num1 = t3.nums or (t1.num1 = t3.nums - 1 and t2.num2 > 0))
         </where>
-        order by vlr.avg_level
-        limit #{dto.pageNo} ,10
     </select>
 
     <select id="selectVideoVOByListId" resultMap="pageVO" parameterType="list">
