@@ -3,7 +3,7 @@
 <mapper namespace="com.rwt.arknights.videos.dao.VideoMapper" >
 
     <resultMap  id="pageVO" type="com.rwt.arknights.videos.vo.VideoVO">
-        <id property="aid" column="id"></id>
+        <id property="aid" column="aid"></id>
         <result property="upName" column="up_name"></result>
         <result property="title" column="title"></result>
         <result property="imgUrl" column="img_url"></result>
@@ -13,7 +13,7 @@
         <result property="minLevel" column="minLevel"></result>
         <result property="avgStar" column="avgStar"></result>
         <!--映射关系，指定属性与属性的类型-->
-        <association property="operators" javaType="com.rwt.arknights.videos.vo.OperatorVO">
+        <collection  property="operators" ofType="com.rwt.arknights.videos.vo.OperatorVO">
             <id property="operatorId" column="operator_id"></id>
             <result property="name" column="name"></result>
             <result property="avatar" column="avatar"></result>
@@ -22,7 +22,7 @@
             <result property="skill" column="skill"></result>
             <result property="skillLevel" column="skill_level"></result>
             <result property="qianneng" column="qianneng"></result>
-        </association>
+        </collection>
     </resultMap>
     <sql id="Base_Column">
       aid,`desc`,stage_id,title,img_url,`type`,up_name,total_tag
@@ -94,5 +94,17 @@
         </where>
         order by vlr.avg_level
         limit #{dto.pageNo} ,10
+    </select>
+
+    <select id="selectVideoVOByListId" resultMap="pageVO">
+        select v.aid, v.title, v.up_name, v.desc,  v.total_tag, v.img_url,
+        s.code as stage, vlr.avg_level, vlr.min_level, vlr.avg_star,
+        o.id as operator_id, o.name, o.avatar, lor.jingying, lor.level, lor.skill, lor.skill_level, lor.qianneng
+        from video v
+        inner join stage s on s.id = v.stage_id
+        inner join video_list_rel vlr on v.aid = vlr.aid
+        inner join list_operator_rel lor on lor.list_id = vlr.id
+        inner join operator o on o.id = lor.operator_id
+        order by vlr.avg_level
     </select>
 </mapper>

@@ -6,6 +6,7 @@ import com.rwt.arknights.log.service.LogService;
 import com.rwt.arknights.videos.dto.NewVideoDTO;
 import com.rwt.arknights.videos.dto.QueryDTO;
 import com.rwt.arknights.videos.service.VideoService;
+import com.rwt.arknights.videos.vo.VideoVO;
 import com.rwt.arknights.web.bean.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
+
+import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
 
 @RequestMapping("/video")
 @RestController
@@ -40,7 +45,7 @@ public class VideoController {
     public JsonResult page(@RequestBody QueryDTO dto) {
         int pageNo = dto.getPageNo();
         dto.setPageNo((pageNo - 1) * 10);
-        videoService.selectPageVO(dto);
-        return JsonResult.OK();
+        List<VideoVO> videoVOS = videoService.selectPageVO(dto);
+        return JsonResult.OK( videoVOS);
     }
 }

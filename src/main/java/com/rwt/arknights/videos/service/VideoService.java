@@ -92,6 +92,7 @@ public class VideoService {
 
     public List<VideoVO> selectPageVO(QueryDTO dto) {
         List<Integer> list = videoMapper.selectPageId(dto);
-        return null;
+        List<VideoVO> videoVOS = videoMapper.selectVideoVOByListId(list);
+        return videoVOS;
     }
 }

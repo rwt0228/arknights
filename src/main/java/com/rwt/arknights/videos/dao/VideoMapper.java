@@ -16,4 +16,6 @@ public interface VideoMapper {
     Video selectByAid(int aid);
 
     List<Integer> selectPageId(@Param("dto") QueryDTO dto);
+
+    List<VideoVO> selectVideoVOByListId(@Param("list")List<Integer> list);
 }
