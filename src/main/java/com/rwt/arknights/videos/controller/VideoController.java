@@ -4,6 +4,7 @@ import com.rwt.arknights.common.bilibili.BiliClient;
 import com.rwt.arknights.common.bilibili.VideoInfoDTO;
 import com.rwt.arknights.log.service.LogService;
 import com.rwt.arknights.videos.dto.NewVideoDTO;
+import com.rwt.arknights.videos.dto.QueryDTO;
 import com.rwt.arknights.videos.service.VideoService;
 import com.rwt.arknights.web.bean.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,14 @@ public class VideoController {
     public JsonResult save(@RequestBody NewVideoDTO dto, HttpServletRequest request) {
         logService.addNewVideo(dto, request);
         videoService.saveNewVideo(dto);
+        return JsonResult.OK();
+    }
+
+    @RequestMapping("/page")
+    public JsonResult page(@RequestBody QueryDTO dto) {
+        int pageNo = dto.getPageNo();
+        dto.setPageNo((pageNo - 1) * 10);
+        videoService.selectPageVO(dto);
         return JsonResult.OK();
     }
 }

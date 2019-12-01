@@ -11,6 +11,8 @@ import com.rwt.arknights.videos.dao.VideoListRelMapper;
 import com.rwt.arknights.videos.dao.VideoMapper;
 import com.rwt.arknights.videos.dto.NewVideoDTO;
 import com.rwt.arknights.videos.dto.OperatorInfoDTO;
+import com.rwt.arknights.videos.dto.QueryDTO;
+import com.rwt.arknights.videos.vo.VideoVO;
 import com.rwt.arknights.web.exceptionHandler.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,5 +88,10 @@ public class VideoService {
             listOperatorRelList.add(rel);
         }
         listOperatorRelMapper.saveList(listOperatorRelList);
+    }
+
+    public List<VideoVO> selectPageVO(QueryDTO dto) {
+        List<Integer> list = videoMapper.selectPageId(dto);
+        return null;
     }
 }
