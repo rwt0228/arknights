@@ -4,18 +4,61 @@
     <meta charset="UTF-8">
     <meta name="referrer" content="never">
     <title>明日方舟作战记录馆</title>
-    <!-- import CSS -->
     <link href="https://cdn.bootcss.com/element-ui/2.12.0/theme-chalk/index.css" rel="stylesheet">
-    <link rel="stylesheet" href="/ak.css">
-    <!--<script src="/js/vue.min.js"></script>-->
-
-    <script src="/operators.js"></script>
-    <script src="/stage.js"></script>
-    <script src="/share.js"></script>
     <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
     <script src="https://cdn.bootcss.com/element-ui/2.12.0/index.js"></script>
     <script src="https://cdn.bootcss.com/vue-router/3.1.3/vue-router.js"></script>
     <script src="https://cdn.bootcss.com/axios/0.19.0/axios.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        a {
+            text-decoration: none;
+        }
+        .my-title {
+            float: left;
+            line-height: 61px;
+            font-size: 30px;
+            font-weight: 700;
+            color: wheat;
+            margin: 0 30px;
+        }
+        .el-menu-item a {
+            line-height: 61px;
+            display: inline-block;
+        }
+        .operator-table{
+            width: 75%;
+            margin-left: 20px;
+            text-align: center;
+        }
+        .operator-table img{
+            vertical-align: top;
+            display: inline-block;
+            height: 40px;
+        }
+        .operator-table .name-label {
+            font-size: 25px;
+            background-color: rgba(0, 0, 0, 0.63);
+            color: white;
+            min-width: 120px;
+        }
+        .operator-row {
+            text-align: left;
+            line-height: 40px;
+            font-size: 23px;
+            vertical-align: top;
+            border: 1px solid #999;
+            background-color: #515151;
+            color: white;
+            font-weight: 400;
+        }
+        .operator-row span {
+            display: inline-block;
+        }
+    </style>
 </head>
 <body>
 <div id="app">
@@ -355,297 +398,18 @@
         </el-dialog>
     </div>
 </template>
-
-
 </body>
 
 <script>
-    const ExcludeOperator = {
-        template: '#excludeOperator',
-        data() {
-            return {
-                filterText: '',
-                visible: false,
-                data: operators,
-                defaultProps: {
-                    children: 'children',
-                    label: 'name',
-                }
-            }
-        },
-        methods: {
-            show() {
-                this.visible = true;
-            },
-            filterNode(value, data) {
-                if (!value) return true;
-                return data.name.indexOf(value) !== -1;
-            },
-            confirm() {
-                var arr = this.$refs.tree.getCheckedNodes();
-                for (var i = 0; i < arr.length; i++) {
-                    if (!arr[i].id) {
-                        arr.splice(i, 1); // 将使后面的元素依次前移，数组长度减1
-                        i--; // 如果不减，将漏掉一个元素
-                    }
-                }
-                this.$emit('confirm',arr);
-                this.visible = false;
-            }
-        },
-        watch: {
-            filterText(val) {
-                this.$refs.tree.filter(val);
-            }
-        }
-    };
-    const AidOperator = {
-        template: '#aidOperator',
-        data() {
-            return {
-                filterText: '',
-                visible: false,
-                data: operators,
-                defaultProps: {
-                    children: 'children',
-                    label: 'name',
-                }
-            }
-        },
-        methods: {
-            show() {
-                this.visible = true;
-            },
-            filterNode(value, data) {
-                if (!value) return true;
-                return data.name.indexOf(value) !== -1;
-            },
-            confirm() {
-                var arr = this.$refs.tree.getCheckedNodes();
-                for (var i = 0; i < arr.length; i++) {
-                    if (!arr[i].id) {
-                        arr.splice(i, 1); // 将使后面的元素依次前移，数组长度减1
-                        i--; // 如果不减，将漏掉一个元素
-                    }
-                }
-                this.$emit('confirm',arr);
-                this.visible = false;
-            }
-        },
-        watch: {
-            filterText(val) {
-                this.$refs.tree.filter(val);
-            }
-        }
-    };
+    const VideoInfo={template:'#videoInfo',data(){return{visible:false,info:{aid:1,upName:'',title:'',desc:'',pic:'',}}},methods:{async show(aid){var res=await axios.post('/video/getInfo?aid='+aid);if(!res.data.status){this.$message.error(res.data.message);return}this.info=res.data.data;this.visible=true}}};const SelectOperator={template:'#selectOperator',data(){return{filterText:'',visible:false,data:operators,defaultProps:{children:'children',label:'name',}}},methods:{show(){this.visible=true},filterNode(value,data){if(!value)return true;return data.name.indexOf(value)!==-1},confirm(){var arr=this.$refs.tree.getCheckedNodes();for(var i=0;i<arr.length;i++){if(!arr[i].id){arr.splice(i,1);i--}}if(arr.length>13){this.$message.error('最多加入13名干员');return}this.$emit('confirm',arr);this.visible=false}},watch:{filterText(val){this.$refs.tree.filter(val)}}};const Share={data(){var checkAid=(rule,value,callback)=>{if(!value){return callback(new Error('请输入av号'))}if(value%1!==0){callback(new Error('请输入数字值'))}else{callback()}};return{share_form:{aid:null,type:"1",stage_id:5,total_tag:1,is_tag:false,},rules:{aid:[{required:true,message:'请输入av号',trigger:'blur'},{validator:checkAid,trigger:'blur'}],type:[{required:true,message:'请选择视频类型',trigger:'blur'},],stage_id:[{required:true,message:'请选择关卡代号',trigger:'blur'},]},operators:[],stage_type_list:stageTypeList,stage_map:stageMap,stage_type:'主线剧情',}},methods:{async onSubmit(){var arr=this.operators;this.$refs['share_form'].validate((valid)=>{if(!valid){return false}});var res=await axios.post('/video/getInfo?aid='+this.share_form.aid);if(!res.data.status){this.$message.error(res.data.message);return}if(arr.length==0){this.$message.error('至少选择一名干员');return}for(var i=0;i<arr.length;i++){var o=arr[i];if(!o.jingying){this.$message.error(o.name+'的精英化不能为空');return}if(!o.level){this.$message.error(o.name+'的干员等级不能为空');return}}this.executeSubmit()},executeSubmit(){var data=this.getSubmitJson();var _this=this;const loading=this.$loading({lock:true,text:'正在提交数据',spinner:'el-icon-loading',background:'rgba(0, 0, 0, 0.7)'});axios({url:'/video/save',method:'post',data:data,headers:{'Content-Type':'application/json'}}).then(function(res){var res=res.data;if(res.status){_this.$message({message:'保存成功',type:'success'});setTimeout(function(){history.go(0)},2000)}else{_this.$message.error(res.message)}loading.close()}).catch(function(error){console.info(error);_this.$message.error("出现未知异常，请联系管理员");loading.close()})},getSubmitJson(){var obj={};obj.aid=this.share_form.aid;obj.type=this.share_form.type;obj.stageId=this.share_form.stage_id;if(this.share_form.is_tag){obj.totalTag=this.share_form.total_tag}var arr=[];for(var i=0;i<this.operators.length;i++){var o=this.operators[i];var newO={};newO.operatorId=o.id;newO.star=o.star;newO.jingying=o.jingying;newO.level=o.level;newO.skill=o.skill?o.skill:0;newO.skillLevel=o.skill_level?o.skill_level:0;newO.qianneng=o.qianneng?o.qianneng:0;arr.push(newO)}obj.operatorList=arr;return JSON.stringify(obj)},clickOperator(){this.$refs.select_operator.show()},clickVideoInfo(){if(!this.share_form.aid){this.$message({message:'请先输入AV号',type:'warning'});return}this.$refs.video_info.show(this.share_form.aid)},changeType(){this.share_form.stage_id=this.stage_map[this.stage_type][0].id;var list=this.stage_type_list;var type=this.stage_type;for(var i=0;i<list.length;i++){if(list[i].description==type){this.share_form.is_tag=list[i].isTag;break}}},confirmOperators(arr){this.operators=arr}},computed:{stages:function(){return stageMap[this.stage_type]}},template:'#share',components:{'select-operator':SelectOperator,'video_info':VideoInfo,}};
 
-    const OperatorTableItem = {
-        data(){
-            return {
-                visible: false,
-            }
-        },
-        computed: {
-            names: function () {
-                var s = "";
-                for(var i = 0; i < this.operators.length; i++) {
-                    if(s) {
-                        s += ",";
-                    }
-                    s += this.operators[i].name;
-                }
-                return s;
-            }
-        },
-        filters: {
-            jingying(value) {
-                var arr=["精零","精一","精二"];
-                return arr[value];
-            },
-            level(value) {
-                return value + "级";
-            },
-            skill(value) {
-                var arr=["略","一技能","二技能","三技能"];
-                return arr[value];
-            },
-            skillLevel(value) {
-                var arr=["略","rank1","rank2","rank3","rank4","rank5","rank6","rank7","专一","专二","专三"];
-                return arr[value];
-            },
-            qianneng(value) {
-                var arr = ["略","一潜","二潜","三潜","四潜","满潜"];
-                return arr[value];
-            }
-        },
-        props: ['operators'],
-        template: '#operatorTableItem',
-    }
-    const Copy = {
-        data() {
-            var stageTypeListCopy = JSON.parse(JSON.stringify(stageTypeList));
-            var stageMapCopy = JSON.parse(JSON.stringify(stageMap));
-            stageTypeListCopy.push({"typeId":0,"description":"不限","isTag":false})
-            stageMapCopy['不限']=[{"id":0,"type":0, "code":"不限"}];
-            return {
-                query_form: {
-                    stage_id: 0,
-                    total_tag: 1,
-                    is_tag: false,
-                    exclude_txt: '',
-                    aid_txt: '',
-                    exclude: [],
-                    aid: [],
-                },
-                stage_type_list: stageTypeListCopy,
-                stage_map: stageMapCopy,
-                stage_type: '不限',
-                tableData: [],
-                currpage: 1,
-                pagesize: 5,
-            }
-        },
-        methods: {
-            query() {
-                var data = this.getQueryData();
-                var _this = this;
-                axios({
-                    url:'/video/page',
-                    method: 'post',
-                    data: data,
-                    headers:{
-                        'Content-Type':'application/json'
-                    }
-                }).then(function(res){
-                    var res = res.data;
-                    if(res.status) {
-                        _this.tableData = res.data;
-                    } else {
-                        _this.$message.error(res.message);
-                    }
-                }).catch(function (error) {
-                    console.info(error);
-                    _this.$message.error("查询异常，请联系管理员");
-                });
-            },
-            getQueryData() {
-                var aidArr = [];
-                var excludeArr = [];
-                var taid = this.query_form.aid;
-                var texclude = this.query_form.exclude;
-                for(var i = 0; i < taid.length; i++) {
-                    aidArr.push(taid[i].id);
-                }
-                for(var i = 0; i < texclude.length; i++) {
-                    excludeArr.push(texclude[i].id);
-                }
-                var obj = {};
-                obj.stageId = this.query_form.stage_id;
-                obj.minTag = this.query_form.total_tag;
-                obj.isTag = this.query_form.is_tag ? 1 : 0;
-                obj.aid = aidArr;
-                obj.exclude = excludeArr;
-                return obj;
-            },
-            changeType() {
-                this.query_form.stage_id = this.stage_map[this.stage_type][0].id;
-                var list = this.stage_type_list;
-                var type = this.stage_type;
-                for (var i = 0; i < list.length; i++) {
-                    if (list[i].description == type) {
-                        this.query_form.is_tag = list[i].isTag;
-                        break;
-                    }
-                }
-            },
-            clickEclude() {
-                this.$refs.exclude_operator.show();
-            },
-            confirmExclude(arr) {
-                if(arr.length > 0) {
-                    this.query_form.exclude_txt = arr[0].name + "等" + arr.length + "名干员";
-                } else {
-                    this.query_form.exclude_txt = "";
-                }
+    var operators=[{name:"狙击干员"},{name:"术师干员"},{name:"医疗干员"},{name:"辅助干员"},{name:"重装干员"},{name:"近卫干员"},{name:"先锋干员"},{name:"特种干员"}];var tezhong=[{"id":113,"name":"红","star":5,"type":"特种","avatar":"/images/avatar/hong.png"},{"id":114,"name":"槐琥","star":5,"type":"特种","avatar":"/images/avatar/huaihu.png"},{"id":116,"name":"崖心","star":5,"type":"特种","avatar":"/images/avatar/yaxin.png"},{"id":117,"name":"狮蝎","star":5,"type":"特种","avatar":"/images/avatar/shixie.png"},{"id":118,"name":"食铁兽","star":5,"type":"特种","avatar":"/images/avatar/shitieshou.png"},{"id":119,"name":"暗索","star":4,"type":"特种","avatar":"/images/avatar/ansuo.png"},{"id":120,"name":"阿消","star":4,"type":"特种","avatar":"/images/avatar/axiao.png"},{"id":122,"name":"伊桑","star":4,"type":"特种","avatar":"/images/avatar/yisang.png"},{"id":123,"name":"砾","star":4,"type":"特种","avatar":"/images/avatar/li.png"}];var fuzhu=[{"id":102,"name":"麦哲伦","star":6,"type":"辅助","avatar":"/images/avatar/maizhelun.png"},{"id":103,"name":"安洁莉娜","star":6,"type":"辅助","avatar":"/images/avatar/anjielina.png"},{"id":104,"name":"初雪","star":5,"type":"辅助","avatar":"/images/avatar/chuxue.png"},{"id":105,"name":"梅尔","star":5,"type":"辅助","avatar":"/images/avatar/meier.png"},{"id":106,"name":"空","star":5,"type":"辅助","avatar":"/images/avatar/kong.png"},{"id":107,"name":"真理","star":5,"type":"辅助","avatar":"/images/avatar/zhenli.png"},{"id":108,"name":"格劳克斯","star":5,"type":"辅助","avatar":"/images/avatar/gelaokesi.png"},{"id":109,"name":"地灵","star":4,"type":"辅助","avatar":"/images/avatar/diling.png"},{"id":110,"name":"深海色","star":4,"type":"辅助","avatar":"/images/avatar/shenhaise.png"},{"id":111,"name":"梓兰","star":3,"type":"辅助","avatar":"/images/avatar/zilan.png"}];var yiliao=[{"id":87,"name":"闪灵","star":6,"type":"医疗","avatar":"/images/avatar/shanling.png"},{"id":88,"name":"夜莺","star":6,"type":"医疗","avatar":"/images/avatar/yeying.png"},{"id":89,"name":"微风","star":5,"type":"医疗","avatar":"/images/avatar/weifeng.png"},{"id":90,"name":"华法琳","star":5,"type":"医疗","avatar":"/images/avatar/huafalin.png"},{"id":91,"name":"赫默","star":5,"type":"医疗","avatar":"/images/avatar/hemo.png"},{"id":92,"name":"白面鸮","star":5,"type":"医疗","avatar":"/images/avatar/baimianxiao.png"},{"id":93,"name":"锡兰","star":5,"type":"医疗","avatar":"/images/avatar/xilan.png"},{"id":94,"name":"调香师","star":4,"type":"医疗","avatar":"/images/avatar/tiaoxiangshi.png"},{"id":95,"name":"嘉维尔","star":4,"type":"医疗","avatar":"/images/avatar/jiaweier.png"},{"id":97,"name":"苏苏洛","star":4,"type":"医疗","avatar":"/images/avatar/susuluo.png"},{"id":98,"name":"末药","star":4,"type":"医疗","avatar":"/images/avatar/moyao.png"},{"id":99,"name":"芙蓉","star":3,"type":"医疗","avatar":"/images/avatar/furong.png"},{"id":100,"name":"安塞尔","star":3,"type":"医疗","avatar":"/images/avatar/ansaier.png"},{"id":101,"name":"Lancet-2","star":2,"type":"医疗","avatar":"/images/avatar/Lancet-2.png"}];var zhongzhuang=[{"id":71,"name":"塞雷娅","star":6,"type":"重装","avatar":"/images/avatar/saileiya.png"},{"id":72,"name":"星熊","star":6,"type":"重装","avatar":"/images/avatar/xingxiong.png"},{"id":73,"name":"拜松","star":5,"type":"重装","avatar":"/images/avatar/baisong.png"},{"id":74,"name":"雷蛇","star":5,"type":"重装","avatar":"/images/avatar/leishe.png"},{"id":75,"name":"临光","star":5,"type":"重装","avatar":"/images/avatar/linguang.png"},{"id":76,"name":"火神","star":5,"type":"重装","avatar":"/images/avatar/huoshen.png"},{"id":77,"name":"可颂","star":5,"type":"重装","avatar":"/images/avatar/kesong.png"},{"id":78,"name":"古米","star":4,"type":"重装","avatar":"/images/avatar/gumi.png"},{"id":79,"name":"角峰","star":4,"type":"重装","avatar":"/images/avatar/jiaofeng.png"},{"id":80,"name":"蛇屠箱","star":4,"type":"重装","avatar":"/images/avatar/shetuxiang.png"},{"id":81,"name":"坚雷","star":3,"type":"重装","avatar":"/images/avatar/jianlei.png"},{"id":82,"name":"米格鲁","star":3,"type":"重装","avatar":"/images/avatar/migelu.png"},{"id":83,"name":"卡提","star":3,"type":"重装","avatar":"/images/avatar/kati.png"},{"id":84,"name":"斑点","star":3,"type":"重装","avatar":"/images/avatar/bandian.png"},{"id":85,"name":"黑角","star":2,"type":"重装","avatar":"/images/avatar/heijiao.png"}];var jinwei=[{"id":47,"name":"银灰","star":6,"type":"近卫","avatar":"/images/avatar/yinhui.png"},{"id":48,"name":"赫拉格","star":6,"type":"近卫","avatar":"/images/avatar/helage.png"},{"id":50,"name":"斯卡蒂","star":6,"type":"近卫","avatar":"/images/avatar/sikadi.png"},{"id":52,"name":"陈","star":6,"type":"近卫","avatar":"/images/avatar/chen.png"},{"id":53,"name":"星极","star":5,"type":"近卫","avatar":"/images/avatar/xingji.png"},{"id":54,"name":"因陀罗","star":5,"type":"近卫","avatar":"/images/avatar/yintuoluo.png"},{"id":55,"name":"炎客","star":5,"type":"近卫","avatar":"/images/avatar/yanke.png"},{"id":56,"name":"幽灵鲨","star":5,"type":"近卫","avatar":"/images/avatar/youlingsha.png"},{"id":57,"name":"诗怀雅","star":5,"type":"近卫","avatar":"/images/avatar/shihuaiya.png"},{"id":58,"name":"暴行","star":5,"type":"近卫","avatar":"/images/avatar/baoxing.png"},{"id":59,"name":"芙兰卡","star":5,"type":"近卫","avatar":"/images/avatar/fulanka.png"},{"id":60,"name":"拉普兰德","star":5,"type":"近卫","avatar":"/images/avatar/lapulande.png"},{"id":61,"name":"艾斯黛尔","star":4,"type":"近卫","avatar":"/images/avatar/aisidaier.png"},{"id":62,"name":"慕斯","star":4,"type":"近卫","avatar":"/images/avatar/musi.png"},{"id":63,"name":"霜叶","star":4,"type":"近卫","avatar":"/images/avatar/shuangye.png"},{"id":64,"name":"缠丸","star":4,"type":"近卫","avatar":"/images/avatar/chanwan.png"},{"id":65,"name":"杜宾","star":4,"type":"近卫","avatar":"/images/avatar/dubin.png"},{"id":66,"name":"猎蜂","star":4,"type":"近卫","avatar":"/images/avatar/liefeng.png"},{"id":67,"name":"玫兰莎","star":3,"type":"近卫","avatar":"/images/avatar/meilansha.png"},{"id":68,"name":"月见夜","star":3,"type":"近卫","avatar":"/images/avatar/yuejianye.png"},{"id":69,"name":"泡普卡","star":3,"type":"近卫","avatar":"/images/avatar/paopuka.png"},{"id":70,"name":"Castle-3","star":2,"type":"近卫","avatar":"/images/avatar/Castle-3.png"}];var xianfeng=[{"id":35,"name":"推进之王","star":6,"type":"先锋","avatar":"/images/avatar/tuijinzhiwang.png"},{"id":36,"name":"凛冬","star":5,"type":"先锋","avatar":"/images/avatar/lindong.png"},{"id":37,"name":"格拉尼","star":5,"type":"先锋","avatar":"/images/avatar/gelani.png"},{"id":38,"name":"德克萨斯","star":5,"type":"先锋","avatar":"/images/avatar/dekesasi.png"},{"id":39,"name":"清道夫","star":4,"type":"先锋","avatar":"/images/avatar/qingdaofu.png"},{"id":40,"name":"讯使","star":4,"type":"先锋","avatar":"/images/avatar/xunshi.png"},{"id":41,"name":"桃金娘","star":4,"type":"先锋","avatar":"/images/avatar/taojinniang.png"},{"id":42,"name":"红豆","star":4,"type":"先锋","avatar":"/images/avatar/hongdou.png"},{"id":43,"name":"芬","star":3,"type":"先锋","avatar":"/images/avatar/fen.png"},{"id":44,"name":"香草","star":3,"type":"先锋","avatar":"/images/avatar/xiangcao.png"},{"id":45,"name":"翎羽","star":3,"type":"先锋","avatar":"/images/avatar/lingyu.png"},{"id":46,"name":"夜刀","star":3,"type":"先锋","avatar":"/images/avatar/yedao.png"}];var juji=[{"id":2,"name":"能天使","star":6,"type":"狙击","avatar":"/images/avatar/nengtianshi.png"},{"id":4,"name":"黑","star":6,"type":"狙击","avatar":"/images/avatar/hei.png"},{"id":5,"name":"送葬人","star":5,"type":"狙击","avatar":"/images/avatar/songzangren.png"},{"id":6,"name":"蓝毒","star":5,"type":"狙击","avatar":"/images/avatar/landu.png"},{"id":7,"name":"普罗旺斯","star":5,"type":"狙击","avatar":"/images/avatar/puluowangsi.png"},{"id":8,"name":"白金","star":5,"type":"狙击","avatar":"/images/avatar/baijin.png"},{"id":9,"name":"守林人","star":5,"type":"狙击","avatar":"/images/avatar/shoulinren.png"},{"id":10,"name":"陨星","star":5,"type":"狙击","avatar":"/images/avatar/yunxing.png"},{"id":11,"name":"杰西卡","star":4,"type":"狙击","avatar":"/images/avatar/jiexika.png"},{"id":12,"name":"白雪","star":5,"type":"狙击","avatar":"/images/avatar/baixue.png"},{"id":13,"name":"梅","star":4,"type":"狙击","avatar":"/images/avatar/mei.png"},{"id":14,"name":"流星","star":4,"type":"狙击","avatar":"/images/avatar/liuxing.png"},{"id":15,"name":"红云","star":4,"type":"狙击","avatar":"/images/avatar/hongyun.png"},{"id":16,"name":"安德切尔","star":3,"type":"狙击","avatar":"/images/avatar/andeqieer.png"},{"id":17,"name":"克洛丝","star":3,"type":"狙击","avatar":"/images/avatar/keluosi.png"},{"id":18,"name":"空爆","star":3,"type":"狙击","avatar":"/images/avatar/kongbao.png"},{"id":19,"name":"巡林者","star":2,"type":"狙击","avatar":"/images/avatar/xunlinzhe.png"}];var shushi=[{"id":20,"name":"艾雅法拉","star":6,"type":"术师","avatar":"/images/avatar/aiyafala.png"},{"id":21,"name":"伊芙利特","star":6,"type":"术师","avatar":"/images/avatar/yifulite.png"},{"id":22,"name":"莫斯提马","star":6,"type":"术师","avatar":"/images/avatar/mositima.png"},{"id":25,"name":"夜魔","star":5,"type":"术师","avatar":"/images/avatar/yemo.png"},{"id":26,"name":"天火","star":5,"type":"术师","avatar":"/images/avatar/tianhuo.png"},{"id":27,"name":"阿米娅","star":5,"type":"术师","avatar":"/images/avatar/amiya.png"},{"id":28,"name":"远山","star":4,"type":"术师","avatar":"/images/avatar/yuanshan.png"},{"id":29,"name":"格雷伊","star":4,"type":"术师","avatar":"/images/avatar/geleiyi.png"},{"id":30,"name":"夜烟","star":4,"type":"术师","avatar":"/images/avatar/yeyan.png"},{"id":31,"name":"史都华德","star":4,"type":"术师","avatar":"/images/avatar/shiduhuade.png"},{"id":32,"name":"炎熔","star":3,"type":"术师","avatar":"/images/avatar/yanrong.png"},{"id":33,"name":"杜林","star":2,"type":"术师","avatar":"/images/avatar/dulin.png"},{"id":34,"name":"12F","star":2,"type":"术师","avatar":"/images/avatar/12f.png"}];operators[0].children=juji;operators[1].children=shushi;operators[2].children=yiliao;operators[3].children=fuzhu;operators[4].children=zhongzhuang;operators[5].children=jinwei;operators[6].children=xianfeng;operators[7].children=tezhong;
 
-                this.query_form.exclude = arr;
-            },
-            clickAid() {
-                this.$refs.aid_operator.show();
-            },
-            confirmAid(arr) {
-                if(arr.length > 0) {
-                    this.query_form.aid_txt = arr[0].name + "等" + arr.length + "名干员";
-                } else {
-                    this.query_form.aid_txt = "";
-                }
-
-                this.query_form.aid = arr;
-            },
-            jumpBili(index, row) {
-                var aid = row.aid;
-                window.open("https://www.bilibili.com/video/av" + aid);
-            },
-            handleCurrentChange(val) {
-                this.currpage = val;
-            }
-        },
-        computed: {
-            stages: function () {
-                return this.stage_map[this.stage_type];
-            }
-        },
-        created() {
-            this.query();
-        },
-        filters: {
-            longTxt(value) {
-                if(value.length > 20) {
-                    return value.slice(0, 20) + "...";
-                } else {
-                    return value;
-                }
-            },
-            tag(value) {
-                if(value <= 0) {
-                    return "---";
-                } else {
-                    return value;
-                }
-            }
-        },
-        components: {
-            'exclude-operator': ExcludeOperator,
-            'aid-operator': AidOperator,
-            'operator-table-item': OperatorTableItem,
-        },
-        template: '#copy'
-    };
-
-
-    const Menu = {
-        data() {
-            return {
-                activeIndex: '1',
-            };
-        },
-        template: '#my-menu',
-
-    };
-    const routes = [
-        {path: '/抄作业', component: Copy},
-        {path: '/写作业', component: Share},
-        {path: '/', component: Copy}
-    ];
-    const router = new VueRouter({routes});
-    new Vue({
-        el: '#app',
-        router,
-        components: {
-            mmenu: Menu, // 注册组件
-        },
-    })
-
-
+    var stageTypeList=[{"typeId":1,"description":"主线剧情","isTag":false},{"typeId":2,"description":"危机合约：无人危楼","isTag":true},{"typeId":3,"description":"危机合约：荒芜广场","isTag":true},{"typeId":4,"description":"危机合约：59区废墟","isTag":true},{"typeId":5,"description":"喧闹法则","isTag":false},{"typeId":6,"description":"剿灭作战","isTag":false}];var stageMap={"危机合约：荒芜广场":[{"id":161,"type":"3","code":"荒芜广场(1201)"},{"id":166,"type":"3","code":"荒芜广场(1202)"}],"危机合约：59区废墟":[{"id":133,"type":"4","code":"59区废墟"}],"主线剧情":[{"id":5,"type":"1","code":"1-5"},{"id":6,"type":"1","code":"1-6"},{"id":7,"type":"1","code":"1-7"},{"id":8,"type":"1","code":"1-8"},{"id":9,"type":"1","code":"1-9"},{"id":10,"type":"1","code":"1-10"},{"id":11,"type":"1","code":"1-11"},{"id":12,"type":"1","code":"1-12"},{"id":13,"type":"1","code":"2-1"},{"id":14,"type":"1","code":"S2-1"},{"id":15,"type":"1","code":"2-2"},{"id":16,"type":"1","code":"S2-2"},{"id":17,"type":"1","code":"S2-3"},{"id":18,"type":"1","code":"S2-4"},{"id":19,"type":"1","code":"2-3"},{"id":20,"type":"1","code":"2-4"},{"id":21,"type":"1","code":"S2-5"},{"id":22,"type":"1","code":"S2-6"},{"id":23,"type":"1","code":"S2-7"},{"id":24,"type":"1","code":"2-5"},{"id":25,"type":"1","code":"2-6"},{"id":26,"type":"1","code":"2-7"},{"id":27,"type":"1","code":"S2-8"},{"id":28,"type":"1","code":"S2-9"},{"id":29,"type":"1","code":"2-8"},{"id":30,"type":"1","code":"2-9"},{"id":31,"type":"1","code":"S2-10"},{"id":32,"type":"1","code":"S2-11"},{"id":33,"type":"1","code":"S2-12"},{"id":34,"type":"1","code":"2-10"},{"id":35,"type":"1","code":"3-1"},{"id":36,"type":"1","code":"3-2"},{"id":37,"type":"1","code":"3-3"},{"id":38,"type":"1","code":"S3-1"},{"id":39,"type":"1","code":"S3-2"},{"id":40,"type":"1","code":"3-4"},{"id":41,"type":"1","code":"3-5"},{"id":42,"type":"1","code":"3-6"},{"id":43,"type":"1","code":"3-7"},{"id":44,"type":"1","code":"S3-3"},{"id":45,"type":"1","code":"S3-4"},{"id":46,"type":"1","code":"S3-5"},{"id":47,"type":"1","code":"3-8"},{"id":48,"type":"1","code":"4-1"},{"id":49,"type":"1","code":"4-2"},{"id":50,"type":"1","code":"4-3"},{"id":51,"type":"1","code":"4-4"},{"id":52,"type":"1","code":"S4-1"},{"id":53,"type":"1","code":"S4-2"},{"id":54,"type":"1","code":"S4-3"},{"id":55,"type":"1","code":"4-5"},{"id":56,"type":"1","code":"4-6"},{"id":57,"type":"1","code":"S4-4"},{"id":58,"type":"1","code":"S4-5"},{"id":59,"type":"1","code":"S4-6"},{"id":60,"type":"1","code":"4-7"},{"id":61,"type":"1","code":"4-8"},{"id":62,"type":"1","code":"4-9"},{"id":63,"type":"1","code":"S4-7"},{"id":64,"type":"1","code":"S4-8"},{"id":65,"type":"1","code":"S4-9"},{"id":66,"type":"1","code":"4-10"},{"id":67,"type":"1","code":"5-1"},{"id":68,"type":"1","code":"5-2"},{"id":69,"type":"1","code":"S5-1"},{"id":70,"type":"1","code":"S5-2"},{"id":71,"type":"1","code":"5-3"},{"id":72,"type":"1","code":"5-4"},{"id":73,"type":"1","code":"5-5"},{"id":74,"type":"1","code":"5-6"},{"id":75,"type":"1","code":"S5-3"},{"id":76,"type":"1","code":"S5-4"},{"id":77,"type":"1","code":"5-7"},{"id":78,"type":"1","code":"5-8"},{"id":79,"type":"1","code":"5-9"},{"id":80,"type":"1","code":"S5-5"},{"id":81,"type":"1","code":"S5-6"},{"id":82,"type":"1","code":"5-10"},{"id":83,"type":"1","code":"H5-1"},{"id":84,"type":"1","code":"H5-2"},{"id":85,"type":"1","code":"H5-3"},{"id":86,"type":"1","code":"H5-4"},{"id":87,"type":"1","code":"突袭0-6"},{"id":88,"type":"1","code":"突袭1-5"},{"id":89,"type":"1","code":"突袭1-6"},{"id":90,"type":"1","code":"突袭1-7"},{"id":91,"type":"1","code":"突袭1-8"},{"id":92,"type":"1","code":"突袭1-9"},{"id":93,"type":"1","code":"突袭1-10"},{"id":94,"type":"1","code":"突袭1-12"},{"id":95,"type":"1","code":"突袭2-1"},{"id":96,"type":"1","code":"突袭2-2"},{"id":97,"type":"1","code":"突袭2-3"},{"id":98,"type":"1","code":"突袭2-4"},{"id":99,"type":"1","code":"突袭2-5"},{"id":100,"type":"1","code":"突袭2-6"},{"id":101,"type":"1","code":"突袭2-7"},{"id":102,"type":"1","code":"突袭2-8"},{"id":103,"type":"1","code":"突袭2-9"},{"id":104,"type":"1","code":"突袭2-10"},{"id":105,"type":"1","code":"突袭3-1"},{"id":106,"type":"1","code":"突袭3-2"},{"id":107,"type":"1","code":"突袭3-3"},{"id":108,"type":"1","code":"突袭3-4"},{"id":109,"type":"1","code":"突袭3-5"},{"id":110,"type":"1","code":"突袭3-6"},{"id":111,"type":"1","code":"突袭3-7"},{"id":112,"type":"1","code":"突袭3-8"},{"id":113,"type":"1","code":"突袭4-1"},{"id":114,"type":"1","code":"突袭4-2"},{"id":115,"type":"1","code":"突袭4-3"},{"id":116,"type":"1","code":"突袭4-4"},{"id":117,"type":"1","code":"突袭4-5"},{"id":118,"type":"1","code":"突袭4-6"},{"id":119,"type":"1","code":"突袭4-7"},{"id":120,"type":"1","code":"突袭4-8"},{"id":121,"type":"1","code":"突袭4-9"},{"id":122,"type":"1","code":"突袭4-10"},{"id":123,"type":"1","code":"突袭5-1"},{"id":124,"type":"1","code":"突袭5-2"},{"id":125,"type":"1","code":"突袭5-3"},{"id":126,"type":"1","code":"突袭5-4"},{"id":127,"type":"1","code":"突袭5-5"},{"id":128,"type":"1","code":"突袭5-6"},{"id":129,"type":"1","code":"突袭5-7"},{"id":130,"type":"1","code":"突袭5-8"},{"id":131,"type":"1","code":"突袭5-9"},{"id":132,"type":"1","code":"突袭5-10"}],"喧闹法则":[{"id":134,"type":"5","code":"CB-EX1"},{"id":135,"type":"5","code":"CB-EX1 突袭"},{"id":136,"type":"5","code":"CB-EX2"},{"id":137,"type":"5","code":"CB-EX2 突袭"},{"id":138,"type":"5","code":"CB-EX3"},{"id":139,"type":"5","code":"CB-EX3 突袭"},{"id":140,"type":"5","code":"CB-EX4"},{"id":141,"type":"5","code":"CB-EX4 突袭"},{"id":142,"type":"5","code":"CB-EX5"},{"id":143,"type":"5","code":"CB-EX5 突袭"},{"id":144,"type":"5","code":"CB-EX6"},{"id":145,"type":"5","code":"CB-EX6 突袭"},{"id":146,"type":"5","code":"CB-EX7"},{"id":147,"type":"5","code":"CB-EX7 突袭"},{"id":148,"type":"5","code":"CB-EX8"},{"id":149,"type":"5","code":"CB-EX8 突袭"},{"id":150,"type":"5","code":"CB-1"},{"id":151,"type":"5","code":"CB-2"},{"id":152,"type":"5","code":"CB-3"},{"id":153,"type":"5","code":"CB-4"},{"id":154,"type":"5","code":"CB-5"},{"id":155,"type":"5","code":"CB-6"},{"id":156,"type":"5","code":"CB-7"},{"id":157,"type":"5","code":"CB-8"},{"id":158,"type":"5","code":"CB-9"},{"id":159,"type":"5","code":"CB-10"}],"剿灭作战":[{"id":162,"type":"6","code":"切尔诺伯格"},{"id":163,"type":"6","code":"龙门外环"},{"id":164,"type":"6","code":"龙门市区"}],"危机合约：无人危楼":[{"id":160,"type":"2","code":"无人危楼(1201)"},{"id":165,"type":"2","code":"无人危楼(1202)"}]};
 </script>
+
+<script>
+    const ExcludeOperator={template:'#excludeOperator',data(){return{filterText:'',visible:false,data:operators,defaultProps:{children:'children',label:'name',}}},methods:{show(){this.visible=true},filterNode(value,data){if(!value)return true;return data.name.indexOf(value)!==-1},confirm(){var arr=this.$refs.tree.getCheckedNodes();for(var i=0;i<arr.length;i++){if(!arr[i].id){arr.splice(i,1);i--}}this.$emit('confirm',arr);this.visible=false}},watch:{filterText(val){this.$refs.tree.filter(val)}}};const AidOperator={template:'#aidOperator',data(){return{filterText:'',visible:false,data:operators,defaultProps:{children:'children',label:'name',}}},methods:{show(){this.visible=true},filterNode(value,data){if(!value)return true;return data.name.indexOf(value)!==-1},confirm(){var arr=this.$refs.tree.getCheckedNodes();for(var i=0;i<arr.length;i++){if(!arr[i].id){arr.splice(i,1);i--}}this.$emit('confirm',arr);this.visible=false}},watch:{filterText(val){this.$refs.tree.filter(val)}}};const OperatorTableItem={data(){return{visible:false,}},computed:{names:function(){var s="";for(var i=0;i<this.operators.length;i++){if(s){s+=","}s+=this.operators[i].name}return s}},filters:{jingying(value){var arr=["精零","精一","精二"];return arr[value]},level(value){return value+"级"},skill(value){var arr=["略","一技能","二技能","三技能"];return arr[value]},skillLevel(value){var arr=["略","rank1","rank2","rank3","rank4","rank5","rank6","rank7","专一","专二","专三"];return arr[value]},qianneng(value){var arr=["略","一潜","二潜","三潜","四潜","满潜"];return arr[value]}},props:['operators'],template:'#operatorTableItem',};const Copy={data(){var stageTypeListCopy=JSON.parse(JSON.stringify(stageTypeList));var stageMapCopy=JSON.parse(JSON.stringify(stageMap));stageTypeListCopy.push({"typeId":0,"description":"不限","isTag":false});stageMapCopy['不限']=[{"id":0,"type":0,"code":"不限"}];return{query_form:{stage_id:0,total_tag:1,is_tag:false,exclude_txt:'',aid_txt:'',exclude:[],aid:[],},stage_type_list:stageTypeListCopy,stage_map:stageMapCopy,stage_type:'不限',tableData:[],currpage:1,pagesize:5,}},methods:{query(){var data=this.getQueryData();var _this=this;axios({url:'/video/page',method:'post',data:data,headers:{'Content-Type':'application/json'}}).then(function(res){var res=res.data;if(res.status){_this.tableData=res.data}else{_this.$message.error(res.message)}}).catch(function(error){console.info(error);_this.$message.error("查询异常，请联系管理员")})},getQueryData(){var aidArr=[];var excludeArr=[];var taid=this.query_form.aid;var texclude=this.query_form.exclude;for(var i=0;i<taid.length;i++){aidArr.push(taid[i].id)}for(var i=0;i<texclude.length;i++){excludeArr.push(texclude[i].id)}var obj={};obj.stageId=this.query_form.stage_id;obj.minTag=this.query_form.total_tag;obj.isTag=this.query_form.is_tag?1:0;obj.aid=aidArr;obj.exclude=excludeArr;return obj},changeType(){this.query_form.stage_id=this.stage_map[this.stage_type][0].id;var list=this.stage_type_list;var type=this.stage_type;for(var i=0;i<list.length;i++){if(list[i].description==type){this.query_form.is_tag=list[i].isTag;break}}},clickEclude(){this.$refs.exclude_operator.show()},confirmExclude(arr){if(arr.length>0){this.query_form.exclude_txt=arr[0].name+"等"+arr.length+"名干员"}else{this.query_form.exclude_txt=""}this.query_form.exclude=arr},clickAid(){this.$refs.aid_operator.show()},confirmAid(arr){if(arr.length>0){this.query_form.aid_txt=arr[0].name+"等"+arr.length+"名干员"}else{this.query_form.aid_txt=""}this.query_form.aid=arr},jumpBili(index,row){var aid=row.aid;window.open("https://www.bilibili.com/video/av"+aid)},handleCurrentChange(val){this.currpage=val}},computed:{stages:function(){return this.stage_map[this.stage_type]}},created(){this.query()},filters:{longTxt(value){if(value.length>20){return value.slice(0,20)+"..."}else{return value}},tag(value){if(value<=0){return"---"}else{return value}}},components:{'exclude-operator':ExcludeOperator,'aid-operator':AidOperator,'operator-table-item':OperatorTableItem,},template:'#copy'};const Menu={data(){return{activeIndex:'1',}},template:'#my-menu',};const routes=[{path:'/抄作业',component:Copy},{path:'/写作业',component:Share},{path:'/',component:Copy}];const router=new VueRouter({routes});new Vue({el:'#app',router,components:{mmenu:Menu,},})
+</script>
+
 </html>
