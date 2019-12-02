@@ -120,7 +120,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="8">
-                        <el-form-item label="支援干员">
+                        <el-form-item label="支援干员" style="display: none">
                             <el-input v-model="query_form.aid_txt" @click.native="clickAid" placeholder="选择可供支援的好友干员"></el-input>
                         </el-form-item>
                     </el-col>
@@ -409,7 +409,292 @@
 </script>
 
 <script>
-    const ExcludeOperator={template:'#excludeOperator',data(){return{filterText:'',visible:false,data:operators,defaultProps:{children:'children',label:'name',}}},methods:{show(){this.visible=true},filterNode(value,data){if(!value)return true;return data.name.indexOf(value)!==-1},confirm(){var arr=this.$refs.tree.getCheckedNodes();for(var i=0;i<arr.length;i++){if(!arr[i].id){arr.splice(i,1);i--}}this.$emit('confirm',arr);this.visible=false}},watch:{filterText(val){this.$refs.tree.filter(val)}}};const AidOperator={template:'#aidOperator',data(){return{filterText:'',visible:false,data:operators,defaultProps:{children:'children',label:'name',}}},methods:{show(){this.visible=true},filterNode(value,data){if(!value)return true;return data.name.indexOf(value)!==-1},confirm(){var arr=this.$refs.tree.getCheckedNodes();for(var i=0;i<arr.length;i++){if(!arr[i].id){arr.splice(i,1);i--}}this.$emit('confirm',arr);this.visible=false}},watch:{filterText(val){this.$refs.tree.filter(val)}}};const OperatorTableItem={data(){return{visible:false,}},computed:{names:function(){var s="";for(var i=0;i<this.operators.length;i++){if(s){s+=","}s+=this.operators[i].name}return s}},filters:{jingying(value){var arr=["精零","精一","精二"];return arr[value]},level(value){return value+"级"},skill(value){var arr=["略","一技能","二技能","三技能"];return arr[value]},skillLevel(value){var arr=["略","rank1","rank2","rank3","rank4","rank5","rank6","rank7","专一","专二","专三"];return arr[value]},qianneng(value){var arr=["略","一潜","二潜","三潜","四潜","满潜"];return arr[value]}},props:['operators'],template:'#operatorTableItem',};const Copy={data(){var stageTypeListCopy=JSON.parse(JSON.stringify(stageTypeList));var stageMapCopy=JSON.parse(JSON.stringify(stageMap));stageTypeListCopy.push({"typeId":0,"description":"不限","isTag":false});stageMapCopy['不限']=[{"id":0,"type":0,"code":"不限"}];return{query_form:{stage_id:0,total_tag:1,is_tag:false,exclude_txt:'',aid_txt:'',exclude:[],aid:[],},stage_type_list:stageTypeListCopy,stage_map:stageMapCopy,stage_type:'不限',tableData:[],currpage:1,pagesize:5,}},methods:{query(){var data=this.getQueryData();var _this=this;axios({url:'/video/page',method:'post',data:data,headers:{'Content-Type':'application/json'}}).then(function(res){var res=res.data;if(res.status){_this.tableData=res.data}else{_this.$message.error(res.message)}}).catch(function(error){console.info(error);_this.$message.error("查询异常，请联系管理员")})},getQueryData(){var aidArr=[];var excludeArr=[];var taid=this.query_form.aid;var texclude=this.query_form.exclude;for(var i=0;i<taid.length;i++){aidArr.push(taid[i].id)}for(var i=0;i<texclude.length;i++){excludeArr.push(texclude[i].id)}var obj={};obj.stageId=this.query_form.stage_id;obj.minTag=this.query_form.total_tag;obj.isTag=this.query_form.is_tag?1:0;obj.aid=aidArr;obj.exclude=excludeArr;return obj},changeType(){this.query_form.stage_id=this.stage_map[this.stage_type][0].id;var list=this.stage_type_list;var type=this.stage_type;for(var i=0;i<list.length;i++){if(list[i].description==type){this.query_form.is_tag=list[i].isTag;break}}},clickEclude(){this.$refs.exclude_operator.show()},confirmExclude(arr){if(arr.length>0){this.query_form.exclude_txt=arr[0].name+"等"+arr.length+"名干员"}else{this.query_form.exclude_txt=""}this.query_form.exclude=arr},clickAid(){this.$refs.aid_operator.show()},confirmAid(arr){if(arr.length>0){this.query_form.aid_txt=arr[0].name+"等"+arr.length+"名干员"}else{this.query_form.aid_txt=""}this.query_form.aid=arr},jumpBili(index,row){var aid=row.aid;window.open("https://www.bilibili.com/video/av"+aid)},handleCurrentChange(val){this.currpage=val}},computed:{stages:function(){return this.stage_map[this.stage_type]}},created(){this.query()},filters:{longTxt(value){if(value.length>20){return value.slice(0,20)+"..."}else{return value}},tag(value){if(value<=0){return"---"}else{return value}}},components:{'exclude-operator':ExcludeOperator,'aid-operator':AidOperator,'operator-table-item':OperatorTableItem,},template:'#copy'};const Menu={data(){return{activeIndex:'1',}},template:'#my-menu',};const routes=[{path:'/抄作业',component:Copy},{path:'/写作业',component:Share},{path:'/',component:Copy}];const router=new VueRouter({routes});new Vue({el:'#app',router,components:{mmenu:Menu,},})
+    const ExcludeOperator = {
+        template: '#excludeOperator',
+        data() {
+            return {
+                filterText: '',
+                visible: false,
+                data: operators,
+                defaultProps: {
+                    children: 'children',
+                    label: 'name',
+                }
+            }
+        },
+        methods: {
+            show() {
+                this.visible = true;
+            },
+            filterNode(value, data) {
+                if (!value) return true;
+                return data.name.indexOf(value) !== -1;
+            },
+            confirm() {
+                var arr = this.$refs.tree.getCheckedNodes();
+                for (var i = 0; i < arr.length; i++) {
+                    if (!arr[i].id) {
+                        arr.splice(i, 1); // 将使后面的元素依次前移，数组长度减1
+                        i--; // 如果不减，将漏掉一个元素
+                    }
+                }
+                this.$emit('confirm',arr);
+                this.visible = false;
+            }
+        },
+        watch: {
+            filterText(val) {
+                this.$refs.tree.filter(val);
+            }
+        }
+    };
+    const AidOperator = {
+        template: '#aidOperator',
+        data() {
+            return {
+                filterText: '',
+                visible: false,
+                data: operators,
+                defaultProps: {
+                    children: 'children',
+                    label: 'name',
+                }
+            }
+        },
+        methods: {
+            show() {
+                this.visible = true;
+            },
+            filterNode(value, data) {
+                if (!value) return true;
+                return data.name.indexOf(value) !== -1;
+            },
+            confirm() {
+                var arr = this.$refs.tree.getCheckedNodes();
+                for (var i = 0; i < arr.length; i++) {
+                    if (!arr[i].id) {
+                        arr.splice(i, 1); // 将使后面的元素依次前移，数组长度减1
+                        i--; // 如果不减，将漏掉一个元素
+                    }
+                }
+                this.$emit('confirm',arr);
+                this.visible = false;
+            }
+        },
+        watch: {
+            filterText(val) {
+                this.$refs.tree.filter(val);
+            }
+        }
+    };
+
+    const OperatorTableItem = {
+        data(){
+            return {
+                visible: false,
+            }
+        },
+        computed: {
+            names: function () {
+                var s = "";
+                for(var i = 0; i < this.operators.length; i++) {
+                    if(s) {
+                        s += ",";
+                    }
+                    s += this.operators[i].name;
+                }
+                return s;
+            }
+        },
+        filters: {
+            jingying(value) {
+                var arr=["精零","精一","精二"];
+                return arr[value];
+            },
+            level(value) {
+                return value + "级";
+            },
+            skill(value) {
+                var arr=["略","一技能","二技能","三技能"];
+                return arr[value];
+            },
+            skillLevel(value) {
+                var arr=["略","rank1","rank2","rank3","rank4","rank5","rank6","rank7","专一","专二","专三"];
+                return arr[value];
+            },
+            qianneng(value) {
+                var arr = ["略","一潜","二潜","三潜","四潜","满潜"];
+                return arr[value];
+            }
+        },
+        props: ['operators'],
+        template: '#operatorTableItem',
+    }
+    const Copy = {
+        data() {
+            var stageTypeListCopy = JSON.parse(JSON.stringify(stageTypeList));
+            var stageMapCopy = JSON.parse(JSON.stringify(stageMap));
+            stageTypeListCopy.push({"typeId":0,"description":"不限","isTag":false})
+            stageMapCopy['不限']=[{"id":0,"type":0, "code":"不限"}];
+            return {
+                query_form: {
+                    stage_id: 0,
+                    total_tag: 1,
+                    is_tag: false,
+                    exclude_txt: '',
+                    aid_txt: '',
+                    exclude: [],
+                    aid: [],
+                },
+                stage_type_list: stageTypeListCopy,
+                stage_map: stageMapCopy,
+                stage_type: '不限',
+                tableData: [],
+                currpage: 1,
+                pagesize: 5,
+            }
+        },
+        methods: {
+            query() {
+                var data = this.getQueryData();
+                var _this = this;
+                axios({
+                    url:'/video/page',
+                    method: 'post',
+                    data: data,
+                    headers:{
+                        'Content-Type':'application/json'
+                    }
+                }).then(function(res){
+                    var res = res.data;
+                    if(res.status) {
+                        _this.tableData = res.data;
+                    } else {
+                        _this.$message.error(res.message);
+                    }
+                }).catch(function (error) {
+                    console.info(error);
+                    _this.$message.error("查询异常，请联系管理员");
+                });
+            },
+            getQueryData() {
+                var aidArr = [];
+                var excludeArr = [];
+                var taid = this.query_form.aid;
+                var texclude = this.query_form.exclude;
+                for(var i = 0; i < taid.length; i++) {
+                    aidArr.push(taid[i].id);
+                }
+                for(var i = 0; i < texclude.length; i++) {
+                    excludeArr.push(texclude[i].id);
+                }
+                var obj = {};
+                obj.stageId = this.query_form.stage_id;
+                obj.minTag = this.query_form.total_tag;
+                obj.isTag = this.query_form.is_tag ? 1 : 0;
+                obj.aid = excludeArr;
+                obj.exclude = excludeArr;
+                return obj;
+            },
+            changeType() {
+                this.query_form.stage_id = this.stage_map[this.stage_type][0].id;
+                var list = this.stage_type_list;
+                var type = this.stage_type;
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i].description == type) {
+                        this.query_form.is_tag = list[i].isTag;
+                        break;
+                    }
+                }
+            },
+            clickEclude() {
+                this.$refs.exclude_operator.show();
+            },
+            confirmExclude(arr) {
+                if(arr.length > 0) {
+                    this.query_form.exclude_txt = arr[0].name + "等" + arr.length + "名干员";
+                } else {
+                    this.query_form.exclude_txt = "";
+                }
+
+                this.query_form.exclude = arr;
+            },
+            clickAid() {
+                this.$refs.aid_operator.show();
+            },
+            confirmAid(arr) {
+                if(arr.length > 0) {
+                    this.query_form.aid_txt = arr[0].name + "等" + arr.length + "名干员";
+                } else {
+                    this.query_form.aid_txt = "";
+                }
+
+                this.query_form.aid = arr;
+            },
+            jumpBili(index, row) {
+                var aid = row.aid;
+                window.open("https://www.bilibili.com/video/av" + aid);
+            },
+            handleCurrentChange(val) {
+                this.currpage = val;
+            }
+        },
+        computed: {
+            stages: function () {
+                return this.stage_map[this.stage_type];
+            }
+        },
+        created() {
+            this.query();
+        },
+        filters: {
+            longTxt(value) {
+                if(value.length > 20) {
+                    return value.slice(0, 20) + "...";
+                } else {
+                    return value;
+                }
+            },
+            tag(value) {
+                if(value <= 0) {
+                    return "---";
+                } else {
+                    return value;
+                }
+            }
+        },
+        components: {
+            'exclude-operator': ExcludeOperator,
+            'aid-operator': AidOperator,
+            'operator-table-item': OperatorTableItem,
+        },
+        template: '#copy'
+    };
+
+
+    const Menu = {
+        data() {
+            return {
+                activeIndex: '1',
+            };
+        },
+        template: '#my-menu',
+
+    };
+    const routes = [
+        {path: '/抄作业', component: Copy},
+        {path: '/写作业', component: Share},
+        {path: '/', component: Copy}
+    ];
+    const router = new VueRouter({routes});
+    new Vue({
+        el: '#app',
+        router,
+        components: {
+            mmenu: Menu, // 注册组件
+        },
+    })
+
 </script>
 
 </html>
