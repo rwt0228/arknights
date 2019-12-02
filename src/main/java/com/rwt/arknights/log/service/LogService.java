@@ -1,9 +1,11 @@
 package com.rwt.arknights.log.service;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.rwt.arknights.common.util.IpUtils;
 import com.rwt.arknights.log.bean.Log;
 import com.rwt.arknights.log.dao.LogMapper;
 import com.rwt.arknights.videos.dto.NewVideoDTO;
+import com.rwt.arknights.videos.dto.QueryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,14 @@ public class LogService {
         log.setAddTime(new Date());
         log.setIp(IpUtils.getIpAddr(request));
         log.setContent("提交保存视频,AV号:" + dto.getAid());
+        save(log);
+    }
+
+    public void addNewQuery(QueryDTO dto, HttpServletRequest request) {
+        Log log = new Log();
+        log.setAddTime(new Date());
+        log.setIp(IpUtils.getIpAddr(request));
+        log.setContent("进行了查询:" + dto.toString());
         save(log);
     }
 }

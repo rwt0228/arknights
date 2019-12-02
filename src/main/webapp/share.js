@@ -16,7 +16,7 @@ const VideoInfo = {
         async show(aid) {
             var res = await axios.post('/video/getInfo?aid=' + aid);
             if(!res.data.status) {
-                this.$message.error('查询b站视频信息错误，请确认AV号正确');
+                this.$message.error(res.data.message);
                 return;
             }
             this.info = res.data.data;
@@ -115,7 +115,7 @@ const Share = {
             });
             var res = await axios.post('/video/getInfo?aid=' + this.share_form.aid);
             if(!res.data.status) {
-                this.$message.error('查询b站视频信息错误，请确认AV号正确');
+                this.$message.error(res.data.message);
                 return;
             }
             if(arr.length == 0) {

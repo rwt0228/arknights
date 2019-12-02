@@ -96,4 +96,8 @@ public class VideoService {
         List<VideoVO> videoVOS = videoMapper.selectVideoVOByListId(list);
         return videoVOS;
     }
+
+    public Video selectByAid(Integer aid) {
+        return videoMapper.selectByAid(aid);
+    }
 }
